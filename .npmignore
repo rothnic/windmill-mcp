@@ -1,0 +1,39 @@
+# Development files
+.github/
+.git/
+.env
+.env.*
+!.env.example
+
+# Generator files (not needed by end users)
+generator/
+scripts/
+overrides/
+
+# Test files
+tests/
+*.test.js
+*.spec.js
+
+# Build artifacts
+*.log
+npm-debug.log*
+.nyc_output/
+coverage/
+
+# Documentation for development
+.github/agents/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp files
+/tmp/
+*.tmp

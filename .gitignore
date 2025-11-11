@@ -137,3 +137,15 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Generator artifacts
+generator/cache/
+generator/temp/
+generator/logs/
+
+# Generated source (tracked but can be regenerated)
+# Uncomment if you don't want to track generated code:
+# src/
+
+# Test artifacts
+tests/fixtures/temp/
