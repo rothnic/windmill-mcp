@@ -36,31 +36,5 @@ export default defineConfig({
     
     // Reporters
     reporters: ['verbose'],
-    
-    // Separate configurations by test type
-    workspace: [
-      {
-        test: {
-          name: 'unit',
-          include: ['tests/unit/**/*.test.js'],
-          environment: 'node',
-        },
-      },
-      {
-        test: {
-          name: 'integration',
-          include: ['tests/integration/**/*.test.js'],
-          environment: 'node',
-        },
-      },
-      {
-        test: {
-          name: 'e2e',
-          include: ['tests/e2e/**/*.test.js'],
-          environment: 'node',
-          testTimeout: 60000,
-        },
-      },
-    ],
   },
 });
