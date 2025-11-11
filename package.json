@@ -18,10 +18,18 @@
     "apply-overrides": "node scripts/apply-overrides.js",
     "validate-overrides": "node scripts/validate-overrides.js",
     "dev": "node src/index.js",
-    "test": "jest",
-    "test:unit": "jest tests/unit",
-    "test:integration": "jest tests/integration",
-    "test:live": "jest tests/integration --testPathPattern=live",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:e2e": "vitest run tests/e2e",
+    "test:coverage": "vitest run --coverage",
+    "docker:up": "docker compose -f tests/docker/docker-compose.yml up -d",
+    "docker:down": "docker compose -f tests/docker/docker-compose.yml down",
+    "docker:logs": "docker compose -f tests/docker/docker-compose.yml logs -f",
+    "docker:wait": "node tests/docker/wait-for-windmill.js",
+    "test:e2e:full": "npm run docker:up && npm run docker:wait && npm run test:e2e; EXIT_CODE=$?; npm run docker:down; exit $EXIT_CODE",
     "lint": "eslint .",
     "format": "prettier --write .",
     "validate": "npm run lint && npm run validate-overrides",
@@ -55,9 +63,11 @@
   "devDependencies": {
     "@types/node": "^20.11.0",
     "eslint": "^8.56.0",
-    "jest": "^29.7.0",
     "jsdoc": "^4.0.2",
-    "prettier": "^3.2.4"
+    "prettier": "^3.2.4",
+    "vitest": "^1.2.0",
+    "@vitest/ui": "^1.2.0",
+    "msw": "^2.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

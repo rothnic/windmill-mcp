@@ -1,0 +1,68 @@
+# Minimal Windmill Docker Setup for E2E Testing
+#
+# This is a simplified single-container setup for testing purposes.
+# For production, use the full multi-container setup from Windmill docs.
+
+version: '3.8'
+
+services:
+  # Windmill server with embedded database and worker
+  windmill:
+    image: ghcr.io/windmill-labs/windmill:main
+    container_name: windmill-test
+    ports:
+      - "8000:8000"
+    environment:
+      # Database (embedded SQLite for simplicity)
+      - DATABASE_URL=postgresql://postgres:changeme@windmill-db:5432/windmill?sslmode=disable
+      
+      # Server configuration
+      - MODE=server
+      - NUM_WORKERS=1
+      - DISABLE_NSJAIL=true
+      - WORKER_TAGS=deno,python3,bash
+      
+      # Authentication (test mode)
+      - SUPERADMIN_SECRET=test-super-secret
+      
+      # Other settings
+      - RUST_LOG=info
+      - BASE_URL=http://localhost:8000
+    
+    volumes:
+      - windmill_data:/tmp/windmill
+    
+    depends_on:
+      windmill-db:
+        condition: service_healthy
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # PostgreSQL database
+  windmill-db:
+    image: postgres:14
+    container_name: windmill-db-test
+    environment:
+      - POSTGRES_PASSWORD=changeme
+      - POSTGRES_DB=windmill
+    
+    volumes:
+      - windmill_db_data:/var/lib/postgresql/data
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    
+    ports:
+      - "5432:5432"
+
+volumes:
+  windmill_data:
+  windmill_db_data:

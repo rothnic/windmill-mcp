@@ -22,12 +22,19 @@
 - [x] Add .npmignore for clean npm publishing
 - [x] Create LICENSE file
 - [x] Create CONTRIBUTING.md
+- [x] Set up Vitest testing framework
+- [x] Create mock utilities for unit testing
+- [x] Create Docker Compose for E2E testing
+- [x] Document testing strategy in TESTING.md
 
 #### Medium Priority
 - [x] Create initial test directory structure
 - [x] Add contributing guidelines
-- [ ] Create changelog template
+- [x] Create changelog template
 - [x] Add license file
+- [x] Create sample unit tests
+- [x] Create sample E2E tests
+- [x] Add wait-for-windmill helper script
 
 #### Low Priority
 - [ ] Add badges to README
@@ -242,6 +249,21 @@ For a task to be considered complete:
 **Decision**: Test against live Windmill instance
 **Rationale**: Ensures real-world compatibility
 **Impact**: Requires test instance setup, more reliable tests
+
+**Date**: 2025-11-11
+**Decision**: Use Vitest instead of Jest for testing
+**Rationale**: Faster, better ESM support, modern API, built-in coverage
+**Impact**: Better developer experience, faster test execution
+
+**Date**: 2025-11-11
+**Decision**: Three-tier testing strategy (unit/integration/e2e)
+**Rationale**: Balance speed, reliability, and coverage
+**Impact**: Unit tests with mocks (fast), E2E with Docker (comprehensive)
+
+**Date**: 2025-11-11
+**Decision**: Minimal Docker setup for E2E testing
+**Rationale**: Easy setup for contributors, no complex service dependencies
+**Impact**: Single-container Windmill with embedded worker, simpler than full production setup
 
 ---
 

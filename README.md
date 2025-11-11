@@ -2,6 +2,8 @@
 
 Provides complete [Windmill](https://windmill.dev) API access through MCP (Model Context Protocol) tools by leveraging Windmill's OpenAPI specification.
 
+> 📘 **New to this project?** Check out the [Quick Start Guide](QUICKSTART.md) for a step-by-step introduction.
+
 ## Overview
 
 This project uses [openapi-mcp-generator](https://github.com/harsha-iiiv/openapi-mcp-generator) to generate an MCP server from Windmill's OpenAPI specification, with support for:
