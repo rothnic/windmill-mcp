@@ -1,7 +1,7 @@
 # Project Status
 
-**Last Updated**: 2025-11-11  
-**Status**: ✅ Foundation Complete - Ready for Phase 2
+**Last Updated**: 2025-11-14  
+**Status**: ✅ Foundation Complete - Ready for Phase 2 (with Automated Updates)
 
 ## Overview
 
@@ -14,6 +14,7 @@ The Windmill MCP Server generator project foundation is complete with:
 - ✅ Comprehensive documentation
 - ✅ npm package configuration (npx execution ready)
 - ✅ All unit tests passing (13/13)
+- ✅ Automated GitHub Actions workflow for updates
 
 ## Quick Stats
 
@@ -32,10 +33,13 @@ The Windmill MCP Server generator project foundation is complete with:
 
 ```
 windmill-mcp/
-├── .github/agents/          # Project planning & agent configs
-│   ├── AGENTS.md           # Agent roles and workflows
-│   ├── PROJECT_PLAN.md     # Project roadmap
-│   └── SPRINTS.md          # Sprint tracking
+├── .github/
+│   ├── agents/              # Project planning & agent configs
+│   │   ├── AGENTS.md       # Agent roles and workflows
+│   │   ├── PROJECT_PLAN.md # Project roadmap
+│   │   └── SPRINTS.md      # Sprint tracking
+│   └── workflows/          # GitHub Actions workflows
+│       └── update-mcp-server.yml # Automated update workflow
 ├── generator/              # OpenAPI spec fetching & generation
 │   ├── config.json         # Generator configuration
 │   ├── fetch-spec.js       # Fetch OpenAPI specs
@@ -124,6 +128,15 @@ windmill-mcp/
 - [x] Docker setup docs
 - [x] Changelog template
 
+### ✅ Automation & CI/CD
+- [x] GitHub Actions workflow for automated updates
+- [x] Manual workflow trigger support
+- [x] Scheduled weekly updates
+- [x] Automatic PR creation with test results
+- [x] Draft PR on test failures
+- [x] Test result artifacts
+- [x] Workflow summary reporting
+
 ## Test Results
 
 ### Unit Tests ✅
@@ -202,6 +215,32 @@ npm run docker:down        # Stop Windmill
 npm run test:e2e:full      # Does all above automatically
 ```
 
+### Automated Updates via GitHub Actions
+
+The project includes an automated workflow for keeping the MCP server up to date:
+
+**Workflow:** `.github/workflows/update-mcp-server.yml`
+
+**Triggers:**
+- **Manual**: Actions → "Update MCP Server" → "Run workflow"
+- **Scheduled**: Weekly on Mondays at midnight UTC
+
+**Process:**
+1. Fetches latest OpenAPI specification from Windmill
+2. Generates MCP server code with overrides
+3. Runs complete test suite
+4. Creates a PR with changes
+5. Sets PR status:
+   - ✅ **Ready for review** if all tests pass
+   - ⚠️ **Draft** if tests fail (with failure details)
+
+**Benefits:**
+- Keeps server in sync with Windmill API changes
+- Automatic testing ensures quality
+- No manual intervention needed for routine updates
+- Clear visibility of test results in PR
+
+
 ## Technology Stack
 
 | Component | Technology | Version |
@@ -243,11 +282,11 @@ npm run test:e2e:full      # Does all above automatically
 ## Next Steps (Phase 2)
 
 ### Immediate
+- [x] Set up GitHub Actions CI/CD for automated updates
 - [ ] Install openapi-mcp-generator as dependency
 - [ ] Integrate actual MCP server generation
 - [ ] Create real tool implementations from OpenAPI
 - [ ] Add more unit tests for generated code
-- [ ] Set up GitHub Actions CI/CD
 
 ### Short Term
 - [ ] Publish v0.1.0 to npm

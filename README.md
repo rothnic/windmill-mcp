@@ -81,9 +81,24 @@ cp .env.example .env
 
 ## Usage
 
-### Generating the MCP Server
+### Automated Updates
 
-To generate or regenerate the MCP server from the latest Windmill OpenAPI spec:
+The MCP server can be automatically updated via GitHub Actions workflow:
+
+- **Manual Trigger**: Navigate to Actions → "Update MCP Server" → "Run workflow"
+- **Scheduled**: Runs weekly on Mondays at midnight UTC
+- **Results**: Creates a PR with updates, marked as draft if tests fail
+
+The workflow:
+1. Fetches the latest OpenAPI specification from Windmill
+2. Regenerates the MCP server code
+3. Applies custom overrides
+4. Runs all tests
+5. Creates a PR with results (ready for review if tests pass, draft if they fail)
+
+### Manual Generation
+
+To manually generate or regenerate the MCP server from the latest Windmill OpenAPI spec:
 
 ```bash
 npm run generate
