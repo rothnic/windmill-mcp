@@ -164,6 +164,24 @@ describe('MCP Tool Integration', () => {
 
 E2E tests run against a real Windmill instance using Docker.
 
+### Two Types of E2E Tests
+
+1. **Direct API Tests** (`windmill-api.test.js`) - Test Windmill API directly
+2. **MCP Integration Tests** (`mcp-integration.test.js`) - Test via MCP protocol
+
+### MCP Integration Testing
+
+The MCP integration tests verify the complete workflow:
+```
+MCP Client → MCP Server → Windmill API → Response
+```
+
+This ensures:
+- MCP server correctly exposes tools
+- Tools properly call Windmill API
+- Responses are formatted correctly
+- Error handling works end-to-end
+
 ### Setup
 
 1. **Start Windmill**:

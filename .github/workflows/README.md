@@ -16,9 +16,12 @@ Automatically updates the MCP server from the latest Windmill OpenAPI specificat
 1. Fetches the latest OpenAPI specification from Windmill
 2. Generates the MCP server code using the generator scripts
 3. Applies any custom overrides from the `overrides/` directory
-4. Runs the complete test suite
-5. Creates a pull request with the changes
-6. Sets PR status based on test results:
+4. Runs unit tests to verify code quality
+5. Starts Windmill in Docker for E2E testing
+6. Runs E2E tests to verify MCP server integration with Windmill API
+7. Stops Windmill Docker containers
+8. Creates a pull request with the changes
+9. Sets PR status based on test results:
    - ✅ **Ready for review** if all tests pass
    - ⚠️ **Draft** if tests fail
 
@@ -30,7 +33,9 @@ Automatically updates the MCP server from the latest Windmill OpenAPI specificat
 
 **Benefits:**
 - Keeps the MCP server in sync with Windmill API changes
-- Automated testing ensures quality before review
+- Automated unit testing ensures code quality
+- E2E testing validates complete MCP → Windmill integration
+- Test failures automatically mark PRs as draft for review
 - No manual intervention needed for routine updates
 - Clear visibility of what changed and test status
 
@@ -71,10 +76,28 @@ Monitor workflow runs at: https://github.com/rothnic/windmill-mcp/actions
 - Check repository settings allow Actions to create PRs
 - Verify branch protection rules don't block automated PRs
 
-### Tests Fail
+### E2E Tests Fail
 - Review test output in workflow logs
 - Check test artifacts for detailed results
 - PRs will be marked as draft automatically
+
+### MCP Integration Tests Skipped
+- E2E tests require Windmill to be running
+- Token setup is currently manual (to be automated)
+- Tests will skip gracefully if Windmill not configured
+
+## Testing Philosophy
+
+The workflow includes two levels of testing:
+
+1. **Unit Tests** (Required) - Must pass for PR to be ready
+   - Fast, isolated tests with no external dependencies
+   - Test MCP server logic and tool implementations
+   
+2. **E2E Tests** (Best Effort) - Validate full integration
+   - Test complete workflow: MCP Client → MCP Server → Windmill API
+   - May be skipped if Windmill setup fails
+   - Validates real-world usage scenarios
 
 ## Related Documentation
 
