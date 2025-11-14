@@ -40,6 +40,15 @@ jobs:
           echo "generation_complete=true" >> $GITHUB_OUTPUT
         continue-on-error: false
       
+      - name: Build generated MCP server
+        id: build
+        run: |
+          cd src
+          npm install
+          npm run build
+          echo "build_complete=true" >> $GITHUB_OUTPUT
+        continue-on-error: false
+      
       - name: Run unit tests
         id: unit-test
         run: |
@@ -200,6 +209,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Spec Fetched:** ${{ steps.fetch-spec.outcome == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Generation Complete:** ${{ steps.generate.outcome == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build Complete:** ${{ steps.build.outcome == 'success' && '✅' || '❌' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Unit Tests:** ${{ steps.unit-test.outputs.unit_test_exit_code == '0' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Windmill Started:** ${{ steps.start-windmill.outcome == 'success' && '✅' || '⚠️ Skipped' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **E2E Tests:** ${{ steps.e2e-test.outputs.e2e_test_exit_code == '0' && '✅ Passed' || steps.e2e-test.outcome == 'skipped' && 'ℹ️ Skipped' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY

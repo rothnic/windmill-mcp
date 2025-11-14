@@ -14,16 +14,17 @@ Automatically updates the MCP server from the latest Windmill OpenAPI specificat
 
 **What it does:**
 1. Fetches the latest OpenAPI specification from Windmill
-2. Generates the MCP server code using the generator scripts
-3. Applies any custom overrides from the `overrides/` directory
-4. Runs unit tests to verify code quality
-5. Starts Windmill in Docker for E2E testing
-6. Runs E2E tests to verify MCP server integration with Windmill API
-7. Stops Windmill Docker containers
-8. Creates a pull request with the changes
-9. Sets PR status based on test results:
-   - ✅ **Ready for review** if all tests pass
-   - ⚠️ **Draft** if tests fail
+2. Generates the MCP server code using `openapi-mcp-generator` (creates ~490 tools automatically)
+3. Builds the generated TypeScript project
+4. Applies any custom overrides from the `overrides/` directory
+5. Runs unit tests to verify code quality
+6. Starts Windmill in Docker for E2E testing
+7. Runs E2E tests to verify MCP server integration with Windmill API
+8. Stops Windmill Docker containers
+9. Creates a pull request with the changes
+10. Sets PR status based on test results:
+    - ✅ **Ready for review** if all tests pass
+    - ⚠️ **Draft** if tests fail
 
 **PR Details:**
 - Branch name: `automated-mcp-update-{run_number}`

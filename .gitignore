@@ -143,9 +143,10 @@ generator/cache/
 generator/temp/
 generator/logs/
 
-# Generated source (tracked but can be regenerated)
-# Uncomment if you don't want to track generated code:
-# src/
+# Generated source (tracked but build artifacts excluded)
+src/build/
+src/node_modules/
+src/.env
 
 # Test artifacts
 tests/fixtures/temp/
