@@ -31,10 +31,10 @@ describe.skipIf(!isE2EEnabled)('Windmill E2E Tests', () => {
   describe('API Connectivity', () => {
     it('should connect to Windmill API', async () => {
       const response = await fetch(`${baseUrl}/api/version`);
-      const data = await response.json();
+      const version = await response.text();
       
       expect(response.ok).toBe(true);
-      expect(data).toHaveProperty('version');
+      expect(version).toMatch(/v\d+\.\d+/); // Version format like "CE v1.576.1"
     });
 
     it('should authenticate with API token', async () => {
