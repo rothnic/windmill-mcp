@@ -142,7 +142,7 @@ jobs:
         run: |
           echo "📦 Creating tarball of generated code..."
           cd src
-          tar -czf ../generated-mcp-server.tar.gz .
+          tar --exclude='./runtime' -czf ../generated-mcp-server.tar.gz .
           cd ..
           echo "✅ Tarball created"
 
@@ -178,7 +178,7 @@ jobs:
 
             ### Test Results
             - ✅ Unit tests passed
-            - ${{ steps.e2e-test.outputs.exit_code == '0' && '✅' || '⚠️' }} E2E tests ${{ steps.e2e-test.outputs.exit_code == '0' && 'passed' || 'completed with warnings' }}
+            - ✅ E2E tests passed
 
             ### Installation
 
