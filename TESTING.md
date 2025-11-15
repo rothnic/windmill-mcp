@@ -176,11 +176,23 @@ The MCP integration tests verify the complete workflow:
 MCP Client → MCP Server → Windmill API → Response
 ```
 
-This ensures:
-- MCP server correctly exposes tools
-- Tools properly call Windmill API
-- Responses are formatted correctly
-- Error handling works end-to-end
+These tests:
+- Use the auto-generated MCP server (490 tools from OpenAPI spec)
+- Call tools via MCP protocol and validate actual data from Windmill
+- Verify response structures (jobs, scripts, workflows, users, workspaces, resources)
+- Test tool discovery (all generated tools are available)
+- Validate error handling for invalid tools and arguments
+- Query real data from Windmill instance to ensure integration works
+
+**Test Coverage:**
+- Version information retrieval
+- Job listing and querying specific jobs
+- Script listing with structure validation
+- Workflow/flow listing with structure validation
+- User information queries
+- Workspace listing
+- Resource listing
+- Error handling for invalid requests
 
 ### Setup
 

@@ -135,14 +135,20 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
       expect(Array.isArray(response.content)).toBe(true);
       expect(response.content[0]).toHaveProperty('text');
       
-      // The response should contain version information
+      // Parse and validate the response contains actual version data
       const resultText = response.content[0].text;
       expect(resultText).toBeTruthy();
+      
+      // The response should be JSON with version information
+      const result = JSON.parse(resultText);
+      expect(result).toHaveProperty('version');
+      expect(typeof result.version).toBe('string');
+      expect(result.version).toMatch(/^\d+\.\d+/); // Version format like "1.520.1"
     });
   });
   
   describe('Job Tools', () => {
-    it('should list jobs through MCP', async () => {
+    it('should list jobs through MCP and return valid data', async () => {
       const response = await mcpClient.request(
         { method: 'tools/call' },
         {
@@ -156,6 +162,58 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
       
       expect(response).toHaveProperty('content');
       expect(response.isError).not.toBe(true);
+      
+      // Parse and validate the response structure
+      const resultText = response.content[0].text;
+      const result = JSON.parse(resultText);
+      
+      // Should return an array of jobs (may be empty)
+      expect(Array.isArray(result)).toBe(true);
+      
+      // If there are jobs, validate their structure
+      if (result.length > 0) {
+        const job = result[0];
+        expect(job).toHaveProperty('id');
+        expect(job).toHaveProperty('workspace_id');
+      }
+    });
+    
+    it('should query specific job data if jobs exist', async () => {
+      // First, get list of jobs
+      const listResponse = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'listJobs',
+            arguments: { workspace },
+          },
+        }
+      );
+      
+      const jobs = JSON.parse(listResponse.content[0].text);
+      
+      if (jobs.length > 0) {
+        // Get details of first job
+        const jobId = jobs[0].id;
+        const getResponse = await mcpClient.request(
+          { method: 'tools/call' },
+          {
+            method: 'tools/call',
+            params: {
+              name: 'getJob',
+              arguments: { workspace, id: jobId },
+            },
+          }
+        );
+        
+        expect(getResponse).toHaveProperty('content');
+        expect(getResponse.isError).not.toBe(true);
+        
+        const jobData = JSON.parse(getResponse.content[0].text);
+        expect(jobData).toHaveProperty('id');
+        expect(jobData.id).toBe(jobId);
+      }
     });
   });
   
@@ -171,6 +229,36 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
       const hasScriptTools = toolNames.some(name => name.toLowerCase().includes('script'));
       expect(hasScriptTools).toBe(true);
     });
+    
+    it('should list scripts through MCP and return valid data', async () => {
+      const response = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'listScripts',
+            arguments: { workspace },
+          },
+        }
+      );
+      
+      expect(response).toHaveProperty('content');
+      expect(response.isError).not.toBe(true);
+      
+      // Parse and validate the response structure
+      const resultText = response.content[0].text;
+      const result = JSON.parse(resultText);
+      
+      // Should return an array of scripts (may be empty)
+      expect(Array.isArray(result)).toBe(true);
+      
+      // If there are scripts, validate their structure
+      if (result.length > 0) {
+        const script = result[0];
+        expect(script).toHaveProperty('path');
+        expect(script).toHaveProperty('workspace_id');
+      }
+    });
   });
   
   describe('Workflow Tools', () => {
@@ -184,6 +272,124 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
       // Check that workflow-related tools exist (names may vary)
       const hasWorkflowTools = toolNames.some(name => name.toLowerCase().includes('flow') || name.toLowerCase().includes('workflow'));
       expect(hasWorkflowTools).toBe(true);
+    });
+    
+    it('should list workflows through MCP and return valid data', async () => {
+      const response = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'listFlows',
+            arguments: { workspace },
+          },
+        }
+      );
+      
+      expect(response).toHaveProperty('content');
+      expect(response.isError).not.toBe(true);
+      
+      // Parse and validate the response structure
+      const resultText = response.content[0].text;
+      const result = JSON.parse(resultText);
+      
+      // Should return an array of workflows (may be empty)
+      expect(Array.isArray(result)).toBe(true);
+      
+      // If there are workflows, validate their structure
+      if (result.length > 0) {
+        const flow = result[0];
+        expect(flow).toHaveProperty('path');
+        expect(flow).toHaveProperty('workspace_id');
+      }
+    });
+  });
+  
+  describe('User and Workspace Tools', () => {
+    it('should query current user information through MCP', async () => {
+      const response = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'getUser',
+            arguments: {},
+          },
+        }
+      );
+      
+      expect(response).toHaveProperty('content');
+      
+      // Even if auth fails, should get a structured response
+      if (!response.isError) {
+        const resultText = response.content[0].text;
+        const result = JSON.parse(resultText);
+        
+        // User object should have expected properties
+        expect(result).toHaveProperty('email');
+      }
+    });
+    
+    it('should list workspaces through MCP', async () => {
+      const response = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'listWorkspaces',
+            arguments: {},
+          },
+        }
+      );
+      
+      expect(response).toHaveProperty('content');
+      
+      // Parse and validate response
+      if (!response.isError) {
+        const resultText = response.content[0].text;
+        const result = JSON.parse(resultText);
+        
+        // Should return an array of workspaces
+        expect(Array.isArray(result)).toBe(true);
+        
+        if (result.length > 0) {
+          const workspace = result[0];
+          expect(workspace).toHaveProperty('id');
+          expect(workspace).toHaveProperty('name');
+        }
+      }
+    });
+  });
+  
+  describe('Resource Tools', () => {
+    it('should list resources through MCP', async () => {
+      const response = await mcpClient.request(
+        { method: 'tools/call' },
+        {
+          method: 'tools/call',
+          params: {
+            name: 'listResource',
+            arguments: { workspace },
+          },
+        }
+      );
+      
+      expect(response).toHaveProperty('content');
+      
+      // Parse and validate response
+      if (!response.isError) {
+        const resultText = response.content[0].text;
+        const result = JSON.parse(resultText);
+        
+        // Should return an array of resources (may be empty)
+        expect(Array.isArray(result)).toBe(true);
+        
+        if (result.length > 0) {
+          const resource = result[0];
+          expect(resource).toHaveProperty('path');
+          expect(resource).toHaveProperty('resource_type');
+        }
+      }
     });
   });
   
