@@ -85,6 +85,8 @@ jobs:
         id: e2e-test
         env:
           E2E_WINDMILL_URL: http://localhost:8000
+          # Use the superadmin secret from docker-compose.yml as the API token
+          E2E_WINDMILL_TOKEN: test-super-secret
           E2E_WORKSPACE: demo
           WINDMILL_BASE_URL: http://localhost:8000
         run: |
