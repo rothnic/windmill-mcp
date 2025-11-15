@@ -23,14 +23,92 @@ git checkout -b feature/your-feature-name
 
 ## Development Workflow
 
+### Quick Development Setup
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start local Windmill and generate MCP server
+npm run dev:setup
+
+# 3. In another terminal, run the MCP server
+npm run dev:mcp
+```
+
+### Detailed Development Workflow
+
+**Starting Local Windmill:**
+
+```bash
+# Start Windmill with development info
+npm run docker:dev
+
+# Output shows:
+# ✅ Windmill ready at http://localhost:8000
+#    Superadmin secret: test-super-secret
+#    Default workspace: admins
+
+# View logs
+npm run docker:logs
+
+# Stop (keeps data)
+npm run docker:down
+
+# Clean everything (removes all data)
+npm run docker:clean
+```
+
+**Testing Against Local Windmill:**
+
+```bash
+# Use superadmin secret for quick testing
+export E2E_WINDMILL_URL=http://localhost:8000
+export E2E_WINDMILL_TOKEN=test-super-secret
+export E2E_WORKSPACE=admins
+
+# Run E2E tests
+npm run test:e2e
+```
+
+See [TESTING.md](TESTING.md) for comprehensive testing documentation.
+
 ### Project Structure
 
 - `generator/` - Scripts for fetching OpenAPI specs and generating the MCP server
 - `overrides/` - Custom modifications that persist across regenerations
-- `src/` - Generated MCP server code (can be regenerated)
+- `src/runtime/` - Runtime loader code (committed to git)
+- `src/` (other files) - **Generated MCP server code** (NOT committed to git, generated locally or downloaded)
 - `tests/` - Test suite
 - `scripts/` - Utility scripts
 - `.github/agents/` - Project planning and agent configurations
+
+### Important: Generated Code and Git
+
+**⚠️ The `src/` directory contains generated code that should NOT be committed to git (except `src/runtime/`).**
+
+The `.gitignore` file is configured to exclude all generated files:
+```gitignore
+# Ignore all generated files in src/ except runtime
+src/*
+!src/runtime/
+```
+
+**Why this matters:**
+- Generated code is specific to each Windmill version
+- Users download pre-built artifacts from GitHub Releases
+- Committing generated code would bloat the repository
+- Pre-commit hooks prevent accidental commits (see below)
+
+**For Development:**
+1. Generate code locally: `npm run generate`
+2. Test against local Windmill: `npm run dev:mcp`
+3. Generated files stay local only
+
+**For CI/CD:**
+- Workflow generates, tests, and packages code
+- Tested artifacts are released to GitHub
+- Users download on-demand via the runtime loader
 
 ### Making Changes
 
@@ -55,6 +133,43 @@ npm run test:integration
 # Validate code
 npm run validate
 ```
+
+### Pre-commit Hooks (Recommended)
+
+To prevent accidentally committing generated code, set up a pre-commit hook:
+
+```bash
+# Create the hook file
+cat > .git/hooks/pre-commit << 'EOF'
+#!/bin/bash
+
+# Check if any generated files in src/ (except src/runtime/) are being committed
+GENERATED_FILES=$(git diff --cached --name-only | grep '^src/' | grep -v '^src/runtime/')
+
+if [ -n "$GENERATED_FILES" ]; then
+    echo "❌ Error: Attempting to commit generated code"
+    echo ""
+    echo "The following generated files should not be committed:"
+    echo "$GENERATED_FILES"
+    echo ""
+    echo "Generated code should stay local only. The .gitignore file"
+    echo "is configured to exclude them, but you may have used 'git add -f'"
+    echo ""
+    echo "To fix:"
+    echo "  git reset HEAD src/  # Unstage generated files"
+    echo "  git add .github/ tests/ package.json README.md  # Stage only source files"
+    echo ""
+    exit 1
+fi
+
+exit 0
+EOF
+
+# Make it executable
+chmod +x .git/hooks/pre-commit
+```
+
+This hook will prevent committing generated files in `src/` (except `src/runtime/`).
 
 ### Generating the MCP Server
 
