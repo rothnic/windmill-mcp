@@ -132,7 +132,15 @@ jobs:
           SUPERADMIN_SECRET: test-super-secret
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: |
+          # Load token from setup script
+          if [ -f tests/.env.test ]; then
+            source tests/.env.test
+          fi
+          npm run test:e2e
+        env:
+          E2E_WINDMILL_URL: http://localhost:8000
+          E2E_WORKSPACE: demo
 
       - name: Upload E2E test results
         if: always()
