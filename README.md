@@ -102,29 +102,101 @@ npx windmill-mcp --clear-cache
 
 For contributors or those who want to customize the server:
 
-### Prerequisites
+#### Prerequisites
 
 - Node.js 18+ and npm
-- Access to a Windmill instance (for testing)
+- Docker and Docker Compose (for local testing)
 - Git
 
-### Installation
+#### Quick Start for Development
 
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/rothnic/windmill-mcp.git
 cd windmill-mcp
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
+
+# Start local Windmill instance and set up everything
+npm run dev:setup
+
+# This will:
+# 1. Start Windmill in Docker
+# 2. Wait for it to be ready
+# 3. Fetch OpenAPI spec from running instance
+# 4. Generate MCP server code
+# 5. Build the generated code
+
+# In another terminal, run the MCP server
+npm run dev:mcp
 ```
 
-3. Configure your Windmill instance (for testing):
+#### Development Workflow
+
+**Working with Local Windmill:**
+
 ```bash
-cp .env.example .env
-# Edit .env with your Windmill instance details
+# Start Windmill for development (includes superadmin token info)
+npm run docker:dev
+
+# Output shows:
+# ✅ Windmill ready at http://localhost:8000
+#    Superadmin secret: test-super-secret
+#    Default workspace: admins
+
+# View Windmill logs
+npm run docker:logs
+
+# Stop Windmill (keeps data)
+npm run docker:down
+
+# Clean everything (removes all data)
+npm run docker:clean
+```
+
+**Running the MCP Server:**
+
+```bash
+# Option 1: Run generated MCP server against local Windmill
+npm run dev:mcp
+
+# Option 2: Run against your own Windmill instance
+cd src
+WINDMILL_BASE_URL=https://your-instance.windmill.dev \
+WINDMILL_API_TOKEN=your-token \
+node build/index.js
+```
+
+**Testing:**
+
+```bash
+# Run all tests
+npm test
+
+# Run only E2E tests (requires running Windmill)
+E2E_WINDMILL_URL=http://localhost:8000 \
+E2E_WINDMILL_TOKEN=test-super-secret \
+E2E_WORKSPACE=admins \
+npm run test:e2e
+
+# Run complete E2E cycle (starts/stops Windmill automatically)
+npm run test:e2e:full
+```
+
+See [TESTING.md](TESTING.md) for comprehensive testing documentation.
+
+#### Regenerating the MCP Server
+
+```bash
+# Fetch latest OpenAPI spec and regenerate
+npm run generate
+
+# The generated code goes to src/
+# Build it to test locally
+cd src
+npm install
+npm run build
 ```
 
 ## Usage

@@ -196,6 +196,55 @@ These tests:
 
 ### Setup
 
+#### Quick Development Setup
+
+For local development and testing, use the superadmin secret from Docker:
+
+```bash
+# Start Windmill and wait for it to be ready
+npm run docker:dev
+
+# This will output:
+# ✅ Windmill ready at http://localhost:8000
+#    Superadmin secret: test-super-secret
+#    Default workspace: admins
+```
+
+Then set up your environment:
+
+```bash
+# Option 1: Use superadmin secret (simplest for development)
+export E2E_WINDMILL_URL=http://localhost:8000
+export E2E_WINDMILL_TOKEN=test-super-secret
+export E2E_WORKSPACE=admins
+npm run test:e2e
+
+# Option 2: Create a user token (recommended for production-like testing)
+# 1. Access http://localhost:8000
+# 2. Login/create account
+# 3. User Settings → Tokens → Create token
+# 4. Add to `.env`:
+E2E_WINDMILL_URL=http://localhost:8000
+E2E_WINDMILL_TOKEN=your-user-token
+E2E_WORKSPACE=admins
+```
+
+#### Complete Development Setup
+
+Set up everything for development in one command:
+
+```bash
+# Start Windmill, generate MCP server, and build it
+npm run dev:setup
+
+# Then in another terminal, run the MCP server
+npm run dev:mcp
+
+# The MCP server will be connected to your local Windmill instance
+```
+
+#### Manual Setup Steps
+
 1. **Start Windmill**:
 ```bash
 npm run docker:up
@@ -207,6 +256,12 @@ npm run docker:wait
 ```
 
 3. **Get API Token**:
+   
+   **For Development** (easiest):
+   - Use the superadmin secret: `test-super-secret`
+   - No need to create an account or login
+   
+   **For Production-like Testing**:
    - Access http://localhost:8000
    - Login/create account
    - User Settings → Tokens → Create token
@@ -214,7 +269,7 @@ npm run docker:wait
    ```bash
    E2E_WINDMILL_URL=http://localhost:8000
    E2E_WINDMILL_TOKEN=your-token-here
-   E2E_WORKSPACE=demo
+   E2E_WORKSPACE=admins
    ```
 
 4. **Run E2E tests**:
@@ -224,7 +279,11 @@ npm run test:e2e
 
 5. **Cleanup**:
 ```bash
+# Stop containers but keep data
 npm run docker:down
+
+# Stop containers and remove all data (clean slate)
+npm run docker:clean
 ```
 
 ### Complete E2E Cycle
