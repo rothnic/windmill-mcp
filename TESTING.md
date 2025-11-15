@@ -196,17 +196,45 @@ These tests:
 
 ### Setup
 
+#### Quick Start (Recommended - CLI-based)
+
+```bash
+# 1. Start Windmill
+npm run docker:up
+
+# 2. Setup E2E environment (installs CLI, creates user, generates token, seeds data)
+npm run setup:e2e
+
+# 3. Run E2E tests
+npm run test:e2e
+
+# 4. Cleanup
+npm run docker:down
+```
+
+Or run everything at once:
+```bash
+npm run test:e2e:full
+```
+
+**What happens:**
+- Installs Windmill CLI (`wmill`)
+- Creates test user account
+- Generates API token via CLI (tests real auth flow)
+- Seeds test data (scripts, workflows, resources)
+- Exports `E2E_WINDMILL_TOKEN` for tests
+
+See [tests/E2E-SETUP.md](tests/E2E-SETUP.md) for detailed documentation.
+
+#### Alternative: Manual Setup
+
 1. **Start Windmill**:
 ```bash
 npm run docker:up
+npm run docker:wait  # Wait for startup (30-60 seconds)
 ```
 
-2. **Wait for startup** (30-60 seconds):
-```bash
-npm run docker:wait
-```
-
-3. **Get API Token**:
+2. **Get API Token**:
    - Access http://localhost:8000
    - Login/create account
    - User Settings → Tokens → Create token
@@ -217,12 +245,12 @@ npm run docker:wait
    E2E_WORKSPACE=demo
    ```
 
-4. **Run E2E tests**:
+3. **Run E2E tests**:
 ```bash
 npm run test:e2e
 ```
 
-5. **Cleanup**:
+4. **Cleanup**:
 ```bash
 npm run docker:down
 ```
