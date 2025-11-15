@@ -152,7 +152,7 @@ jobs:
         run: |
           echo "📦 Creating tarball of generated code..."
           cd src
-          tar -czf ../generated-mcp-server.tar.gz .
+          tar --exclude='./runtime' -czf ../generated-mcp-server.tar.gz .
           cd ..
           echo "✅ Tarball created"
 

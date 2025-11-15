@@ -10,7 +10,7 @@ import { execSync } from 'child_process';
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
-import { saveToCache, getCacheDir } from './cache.js';
+import { saveToCache } from './cache.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,7 +25,6 @@ export async function generateLocally(windmillVersion) {
 
   const projectRoot = path.resolve(__dirname, '..', '..');
   const generatorDir = path.join(projectRoot, 'generator');
-  const tempOutputDir = path.join(projectRoot, 'src', 'generated-temp');
 
   try {
     // Fetch OpenAPI spec
@@ -77,7 +76,6 @@ async function fetchOpenAPISpec(windmillVersion, generatorDir) {
   console.log(`   Spec URL: ${specUrl}`);
 
   // Run fetch-spec with custom URL
-  const { execSync } = await import('child_process');
   execSync('npm run fetch-spec', {
     cwd: path.dirname(generatorDir),
     stdio: 'inherit',
