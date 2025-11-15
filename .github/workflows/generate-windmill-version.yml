@@ -36,11 +36,15 @@ jobs:
           echo "🚀 Starting Windmill instance..."
           npm run docker:up
 
-      - name: Wait for Windmill to be ready
+      - name: Setup Windmill with CLI (token + test data)
         run: |
-          echo "⏳ Waiting for Windmill to be ready..."
-          npm run docker:wait
+          echo "⏳ Setting up Windmill with CLI..."
+          npm run setup:e2e
         timeout-minutes: 5
+        env:
+          E2E_WINDMILL_URL: http://localhost:8000
+          E2E_WORKSPACE: demo
+          SUPERADMIN_SECRET: test-super-secret
 
       - name: Fetch OpenAPI spec from Windmill
         id: fetch-spec
@@ -83,12 +87,18 @@ jobs:
 
       - name: Run E2E tests
         id: e2e-test
-        env:
-          E2E_WINDMILL_URL: http://localhost:8000
-          E2E_WORKSPACE: demo
-          WINDMILL_BASE_URL: http://localhost:8000
         run: |
           echo "🧪 Running E2E tests..."
+
+          # Load token from setup script
+          if [ -f tests/.env.test ]; then
+            export $(cat tests/.env.test | xargs)
+          fi
+
+          export E2E_WINDMILL_URL=http://localhost:8000
+          export E2E_WORKSPACE=demo
+          export WINDMILL_BASE_URL=http://localhost:8000
+
           npm run test:e2e 2>&1 | tee e2e-test-output.txt
           TEST_EXIT_CODE=${PIPESTATUS[0]}
           echo "exit_code=$TEST_EXIT_CODE" >> $GITHUB_OUTPUT

@@ -104,11 +104,54 @@ jobs:
           
           echo "✅ Generated MCP server builds successfully"
           
+  e2e-tests:
+    runs-on: ubuntu-latest
+    continue-on-error: true  # E2E tests are informational, don't block PR
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Windmill
+        run: npm run docker:up
+
+      - name: Setup Windmill with CLI
+        run: npm run setup:e2e
+        env:
+          E2E_WINDMILL_URL: http://localhost:8000
+          E2E_WORKSPACE: demo
+          SUPERADMIN_SECRET: test-super-secret
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload E2E test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: |
+            tests/.env.test
+          retention-days: 7
+
+      - name: Stop Windmill
+        if: always()
+        run: npm run docker:down
+
   test-summary:
     runs-on: ubuntu-latest
-    needs: [unit-tests, generator-validation]
+    needs: [unit-tests, generator-validation, e2e-tests]
     if: always()
-    
+
     steps:
       - name: Check test results
         run: |
@@ -116,14 +159,18 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Unit Tests**: ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Generator Validation**: ${{ needs.generator-validation.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
-          
+          echo "- **E2E Tests**: ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || needs.e2e-tests.result == 'failure' && '⚠️ Failed (non-blocking)' || '⏭️ Skipped' }}" >> $GITHUB_STEP_SUMMARY
+
           if [ "${{ needs.unit-tests.result }}" != "success" ] || [ "${{ needs.generator-validation.result }}" != "success" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "❌ **Required checks failed - PR cannot be merged**" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "✅ **All required checks passed**" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Note: Generated MCP server will be tested in version branches" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.e2e-tests.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ **Note**: E2E tests did not pass but are non-blocking" >> $GITHUB_STEP_SUMMARY
+          fi
