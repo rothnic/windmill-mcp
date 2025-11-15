@@ -33,7 +33,14 @@ windmill-mcp/
 Run the MCP server directly with npx:
 
 ```bash
-npx rothnic/windmill-mcp
+# Latest published version
+npx windmill-mcp
+
+# Specific Windmill version (latest iteration)
+npx windmill-mcp@1.520.1-mcp
+
+# Specific iteration
+npx windmill-mcp@1.520.1-mcp.0
 ```
 
 Or add to your MCP client configuration (e.g., Claude Desktop):
@@ -43,7 +50,7 @@ Or add to your MCP client configuration (e.g., Claude Desktop):
   "mcpServers": {
     "windmill": {
       "command": "npx",
-      "args": ["rothnic/windmill-mcp"],
+      "args": ["windmill-mcp"],
       "env": {
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-api-token"
@@ -51,6 +58,29 @@ Or add to your MCP client configuration (e.g., Claude Desktop):
     }
   }
 }
+```
+
+### Version Targeting
+
+The MCP server uses a versioning scheme that maps to Windmill API versions:
+
+- **Format**: `{windmill-version}-mcp.{iteration}`
+- **Example**: `1.520.1-mcp.0` = First MCP build for Windmill 1.520.1
+- **Example**: `1.520.1-mcp.1` = Second iteration (improvements/fixes)
+
+Target specific versions:
+```bash
+# Latest iteration for Windmill 1.520.1
+npx windmill-mcp@1.520.1-mcp
+
+# Specific iteration (recommended for stability)
+npx windmill-mcp@1.520.1-mcp.0
+
+# Latest published (may change)
+npx windmill-mcp
+
+# From Git branch (development)
+npx github:rothnic/windmill-mcp#windmill-latest
 ```
 
 ### Development Setup
