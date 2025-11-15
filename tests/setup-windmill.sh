@@ -52,7 +52,8 @@ curl -X POST "$WINDMILL_URL/api/users/create" \
     \"email\": \"$TEST_USER_EMAIL\",
     \"password\": \"$TEST_USER_PASSWORD\",
     \"company\": \"test\",
-    \"username\": \"testuser\"
+    \"username\": \"testuser\",
+    \"super_admin\": false
   }" 2>/dev/null || echo "User may already exist"
 
 echo ""

@@ -173,12 +173,17 @@ echo ""
 # 5. Run a test job to generate some job history
 echo "🚀 Running test job to generate job history..."
 
-JOB_ID=$(api_call POST "/jobs/run/f/examples/test_python_script" '{}' | grep -oP '"uuid":"\K[^"]+' || echo "")
+# Wait a moment for script to be fully created
+sleep 2
 
-if [ -n "$JOB_ID" ]; then
+JOB_RESULT=$(api_call POST "/jobs/run/f/examples/test_python_script" '{}' 2>&1)
+JOB_ID=$(echo "$JOB_RESULT" | grep -oP '"uuid":"\K[^"]+' || echo "")
+
+if [ -n "$JOB_ID" ] && [ "$JOB_ID" != "null" ]; then
   echo "  ✅ Test job queued: $JOB_ID"
 else
-  echo "  ⚠️  Could not queue test job"
+  echo "  ⚠️  Could not queue test job (script may not be ready yet)"
+  # This is not critical for test data seeding
 fi
 
 echo ""
