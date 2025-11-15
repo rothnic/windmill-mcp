@@ -128,11 +128,18 @@ jobs:
 
       - name: Check test results
         run: |
-          if [ "${{ steps.unit-test.outcome }}" != "success" ]; then
-            echo "❌ Tests failed for version ${{ matrix.version }}"
+          # STRICT: Both unit AND E2E tests must pass
+          if [ "${{ steps.unit-test.outcome }}" != "success" ] || [ "${{ steps.e2e-test.outcome }}" != "success" ]; then
+            echo "❌ Tests failed for version ${{ matrix.version }} - no release will be created"
+            if [ "${{ steps.unit-test.outcome }}" != "success" ]; then
+              echo "   - Unit tests: FAILED"
+            fi
+            if [ "${{ steps.e2e-test.outcome }}" != "success" ]; then
+              echo "   - E2E tests: FAILED"
+            fi
             exit 1
           fi
-          echo "✅ Tests passed"
+          echo "✅ All tests passed - ready for release"
 
       - name: Get package version
         id: package-version

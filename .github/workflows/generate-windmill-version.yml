@@ -111,14 +111,21 @@ jobs:
         id: test-status
         run: |
           UNIT_EXIT=${{ steps.unit-test.outputs.exit_code || '1' }}
+          E2E_EXIT=${{ steps.e2e-test.outputs.exit_code || '1' }}
 
-          # Tests pass if unit tests pass
-          if [ "$UNIT_EXIT" = "0" ]; then
+          # STRICT: Both unit AND E2E tests must pass for release
+          if [ "$UNIT_EXIT" = "0" ] && [ "$E2E_EXIT" = "0" ]; then
             echo "passed=true" >> $GITHUB_OUTPUT
-            echo "✅ All required tests passed"
+            echo "✅ All tests passed - ready for release"
           else
             echo "passed=false" >> $GITHUB_OUTPUT
-            echo "❌ Tests failed"
+            echo "❌ Tests failed - no release will be created"
+            if [ "$UNIT_EXIT" != "0" ]; then
+              echo "   - Unit tests: FAILED"
+            fi
+            if [ "$E2E_EXIT" != "0" ]; then
+              echo "   - E2E tests: FAILED"
+            fi
             exit 1
           fi
 
