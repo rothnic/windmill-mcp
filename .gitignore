@@ -143,10 +143,8 @@ generator/cache/
 generator/temp/
 generator/logs/
 
-# Generated source (tracked but build artifacts excluded)
-src/build/
-src/node_modules/
-src/.env
+# Generated MCP server (only exists in version branches, not main)
+src/
 
 # Test artifacts
 tests/fixtures/temp/
