@@ -7,7 +7,7 @@
  * Useful for CI/CD and automated testing.
  */
 
-const http = require('http');
+import http from 'http';
 
 const WINDMILL_URL = process.env.E2E_WINDMILL_URL || 'http://localhost:8000';
 const MAX_ATTEMPTS = 60; // 5 minutes with 5 second intervals
@@ -64,7 +64,15 @@ async function waitForWindmill() {
 }
 
 // Run if executed directly
-if (require.main === module) {
+// In ES modules, we check if this is the main module using import.meta.url
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Check if this script is being run directly
+if (process.argv[1] === __filename) {
   waitForWindmill()
     .then((ready) => {
       process.exit(ready ? 0 : 1);
@@ -75,4 +83,4 @@ if (require.main === module) {
     });
 }
 
-module.exports = { waitForWindmill, checkWindmill };
+export { waitForWindmill, checkWindmill };
