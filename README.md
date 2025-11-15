@@ -1,5 +1,8 @@
 # Windmill MCP Server
 
+[![CI Tests](https://github.com/rothnic/windmill-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rothnic/windmill-mcp/actions/workflows/ci.yml)
+[![Update MCP Server](https://github.com/rothnic/windmill-mcp/actions/workflows/update-mcp-server.yml/badge.svg)](https://github.com/rothnic/windmill-mcp/actions/workflows/update-mcp-server.yml)
+
 Provides complete [Windmill](https://windmill.dev) API access through MCP (Model Context Protocol) tools by leveraging Windmill's OpenAPI specification.
 
 > 📘 **New to this project?** Check out the [Quick Start Guide](QUICKSTART.md) for a step-by-step introduction.
@@ -81,9 +84,24 @@ cp .env.example .env
 
 ## Usage
 
-### Generating the MCP Server
+### Automated Updates
 
-To generate or regenerate the MCP server from the latest Windmill OpenAPI spec:
+The MCP server can be automatically updated via GitHub Actions workflow:
+
+- **Manual Trigger**: Navigate to Actions → "Update MCP Server" → "Run workflow"
+- **Scheduled**: Runs weekly on Mondays at midnight UTC
+- **Results**: Creates a PR with updates, marked as draft if tests fail
+
+The workflow:
+1. Fetches the latest OpenAPI specification from Windmill
+2. Regenerates the MCP server code
+3. Applies custom overrides
+4. Runs all tests
+5. Creates a PR with results (ready for review if tests pass, draft if they fail)
+
+### Manual Generation
+
+To manually generate or regenerate the MCP server from the latest Windmill OpenAPI spec:
 
 ```bash
 npm run generate
@@ -177,6 +195,15 @@ Project planning, sprints, and agent configurations are maintained in `.github/a
 2. Make your changes (preferably in `overrides/` for customizations)
 3. Run tests: `npm test`
 4. Submit a pull request
+
+### CI/CD Checks
+
+All pull requests run automated CI checks:
+- ✅ **Unit Tests** (required) - Must pass to merge
+- ✅ **Build Verification** (required) - Generated server must build
+- ℹ️ **E2E Tests** (informational) - Tests with Windmill in Docker
+
+PRs cannot be merged until required checks pass.
 
 ## Publishing
 

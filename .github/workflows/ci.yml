@@ -1,0 +1,129 @@
+name: CI Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run unit tests
+        run: npm run test:unit
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+          retention-days: 7
+          
+  generator-validation:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Validate generator scripts
+        run: |
+          echo "Validating generator scripts..."
+          node generator/fetch-spec.js --help
+          node generator/generate.js --help
+          echo "✅ Generator scripts are valid"
+          
+      - name: Test OpenAPI spec fetch
+        run: |
+          npm run fetch-spec
+          if [ ! -f "generator/cache/openapi-spec.json" ]; then
+            echo "❌ Failed to fetch OpenAPI spec"
+            exit 1
+          fi
+          echo "✅ OpenAPI spec fetched successfully"
+          
+      - name: Test MCP server generation
+        run: |
+          echo "Testing MCP server generation..."
+          npm run generate
+          
+          # Verify generation succeeded
+          if [ ! -d "src" ]; then
+            echo "❌ Generation failed - src/ directory not created"
+            exit 1
+          fi
+          
+          if [ ! -f "src/src/index.ts" ]; then
+            echo "❌ Generation failed - index.ts not found"
+            exit 1
+          fi
+          
+          echo "✅ MCP server generated successfully"
+          
+      - name: Test building generated server
+        run: |
+          echo "Testing build of generated MCP server..."
+          cd src
+          npm install
+          npm run build
+          
+          if [ ! -f "build/index.js" ]; then
+            echo "❌ Build failed - build/index.js not found"
+            exit 1
+          fi
+          
+          echo "✅ Generated MCP server builds successfully"
+          
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, generator-validation]
+    if: always()
+    
+    steps:
+      - name: Check test results
+        run: |
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unit Tests**: ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Generator Validation**: ${{ needs.generator-validation.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.unit-tests.result }}" != "success" ] || [ "${{ needs.generator-validation.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Required checks failed - PR cannot be merged**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **All required checks passed**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Note: Generated MCP server will be tested in version branches" >> $GITHUB_STEP_SUMMARY
