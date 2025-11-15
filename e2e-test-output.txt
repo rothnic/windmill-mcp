@@ -1,0 +1,23 @@
+
+> windmill-mcp@0.1.0 test:e2e
+> vitest run tests/e2e
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90m/home/runner/work/windmill-mcp/windmill-mcp[39m
+
+ [32m✓[39m tests/e2e/windmill-api.test.js[2m > [22mE2E Test Configuration[2m > [22mshould have E2E environment variables documented
+ [32m✓[39m tests/e2e/windmill-api.test.js[2m > [22mE2E Test Configuration[2m > [22mshould skip E2E tests when not configured
+[90mstdout[2m | tests/e2e/windmill-api.test.js[2m > [22m[2mE2E Test Configuration[2m > [22m[2mshould skip E2E tests when not configured[22m[39m
+E2E tests skipped - set E2E_WINDMILL_URL and E2E_WINDMILL_TOKEN to enable
+
+ [32m✓[39m tests/e2e/mcp-integration.test.js[2m > [22mMCP E2E Test Configuration[2m > [22mshould have E2E environment variables documented
+ [32m✓[39m tests/e2e/mcp-integration.test.js[2m > [22mMCP E2E Test Configuration[2m > [22mshould skip MCP E2E tests when not configured
+[90mstdout[2m | tests/e2e/mcp-integration.test.js[2m > [22m[2mMCP E2E Test Configuration[2m > [22m[2mshould skip MCP E2E tests when not configured[22m[39m
+MCP E2E tests skipped - set E2E_WINDMILL_URL and E2E_WINDMILL_TOKEN to enable
+
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m4 passed[39m[22m[2m | [22m[33m19 skipped[39m[90m (23)[39m
+[2m   Start at [22m 04:42:12
+[2m   Duration [22m 340ms[2m (transform 96ms, setup 20ms, collect 112ms, tests 10ms, environment 0ms, prepare 175ms)[22m
+
