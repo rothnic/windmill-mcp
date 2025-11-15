@@ -4,6 +4,35 @@ This directory contains automated workflows for the Windmill MCP Server project.
 
 ## Available Workflows
 
+### CI Tests (`ci.yml`)
+
+Runs automated tests on pull requests and merges to main branch to ensure code quality.
+
+**Triggers:**
+- **Pull Requests**: Runs on all PRs to main branch
+- **Push to Main**: Runs on direct pushes to main branch
+- **Manual**: Can be triggered manually via workflow_dispatch
+
+**What it does:**
+1. **Unit Tests** (required) - Runs unit tests with mocks
+2. **Build** (required) - Verifies generated server can be built
+3. **E2E Tests** (best effort) - Tests with Windmill in Docker if server exists
+
+**Job Details:**
+
+- **unit-tests**: Runs `npm run test:unit` to verify all unit tests pass
+- **build-generated-server**: Checks if generated server exists and builds it
+- **e2e-tests**: Starts Windmill in Docker and runs E2E tests (skipped if server doesn't exist)
+- **test-summary**: Aggregates results and fails if required checks don't pass
+
+**PR Blocking:**
+- Unit tests MUST pass for PR to be mergeable
+- Build MUST succeed for PR to be mergeable
+- E2E tests are informational (won't block merge)
+
+**Status Checks:**
+This workflow creates required status checks that must pass before a PR can be merged.
+
 ### Update MCP Server (`update-mcp-server.yml`)
 
 Automatically updates the MCP server from the latest Windmill OpenAPI specification.

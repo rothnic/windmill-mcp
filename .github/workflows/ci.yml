@@ -1,0 +1,177 @@
+name: CI Tests
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run unit tests
+        run: npm run test:unit
+        
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+          retention-days: 7
+          
+  build-generated-server:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install root dependencies
+        run: npm ci
+        
+      - name: Check if generated server exists
+        id: check-server
+        run: |
+          if [ -d "src/src" ]; then
+            echo "server_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "server_exists=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Install generated server dependencies
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: |
+          cd src
+          npm install
+          
+      - name: Build generated server
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: |
+          cd src
+          npm run build
+          
+      - name: Verify build output
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: |
+          if [ ! -f "src/build/index.js" ]; then
+            echo "❌ Build output not found"
+            exit 1
+          fi
+          echo "✅ Build output verified"
+          
+  e2e-tests:
+    runs-on: ubuntu-latest
+    needs: build-generated-server
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install root dependencies
+        run: npm ci
+        
+      - name: Check if generated server exists
+        id: check-server
+        run: |
+          if [ -d "src/src" ]; then
+            echo "server_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "server_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠️ Generated server not found, E2E tests will be skipped"
+          fi
+          
+      - name: Install and build generated server
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: |
+          cd src
+          npm install
+          npm run build
+          
+      - name: Start Windmill for E2E tests
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: npm run docker:up
+        
+      - name: Wait for Windmill to be ready
+        if: steps.check-server.outputs.server_exists == 'true'
+        run: npm run docker:wait
+        timeout-minutes: 5
+        continue-on-error: true
+        
+      - name: Run E2E tests
+        if: steps.check-server.outputs.server_exists == 'true'
+        env:
+          E2E_WINDMILL_URL: http://localhost:8000
+          E2E_WORKSPACE: demo
+          # Note: E2E tests will skip if no token is available
+          # Token setup would need to be automated for full E2E testing
+        run: npm run test:e2e
+        continue-on-error: true
+        
+      - name: Stop Windmill
+        if: always() && steps.check-server.outputs.server_exists == 'true'
+        run: npm run docker:down
+        
+      - name: Upload E2E test results
+        if: always() && steps.check-server.outputs.server_exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-test-results
+          path: |
+            e2e-test-output.txt
+          retention-days: 7
+          
+  test-summary:
+    runs-on: ubuntu-latest
+    needs: [unit-tests, build-generated-server, e2e-tests]
+    if: always()
+    
+    steps:
+      - name: Check test results
+        run: |
+          echo "## Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unit Tests**: ${{ needs.unit-tests.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build**: ${{ needs.build-generated-server.result == 'success' && '✅ Passed' || '❌ Failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **E2E Tests**: ${{ needs.e2e-tests.result == 'success' && '✅ Passed' || needs.e2e-tests.result == 'skipped' && 'ℹ️ Skipped' || '⚠️ See logs' }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.unit-tests.result }}" != "success" ] || [ "${{ needs.build-generated-server.result }}" != "success" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Required checks failed - PR cannot be merged**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **All required checks passed**" >> $GITHUB_STEP_SUMMARY

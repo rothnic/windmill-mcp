@@ -1,5 +1,6 @@
 # Windmill MCP Server
 
+[![CI Tests](https://github.com/rothnic/windmill-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/rothnic/windmill-mcp/actions/workflows/ci.yml)
 [![Update MCP Server](https://github.com/rothnic/windmill-mcp/actions/workflows/update-mcp-server.yml/badge.svg)](https://github.com/rothnic/windmill-mcp/actions/workflows/update-mcp-server.yml)
 
 Provides complete [Windmill](https://windmill.dev) API access through MCP (Model Context Protocol) tools by leveraging Windmill's OpenAPI specification.
@@ -194,6 +195,15 @@ Project planning, sprints, and agent configurations are maintained in `.github/a
 2. Make your changes (preferably in `overrides/` for customizations)
 3. Run tests: `npm test`
 4. Submit a pull request
+
+### CI/CD Checks
+
+All pull requests run automated CI checks:
+- ✅ **Unit Tests** (required) - Must pass to merge
+- ✅ **Build Verification** (required) - Generated server must build
+- ℹ️ **E2E Tests** (informational) - Tests with Windmill in Docker
+
+PRs cannot be merged until required checks pass.
 
 ## Publishing
 
