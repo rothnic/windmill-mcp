@@ -156,6 +156,24 @@ jobs:
             echo "❌ Tests failed"
           fi
           
+      - name: Create target branch if it doesn't exist
+        run: |
+          TARGET_BRANCH="${{ steps.target-branch.outputs.target_branch }}"
+          echo "🔍 Checking if branch '$TARGET_BRANCH' exists..."
+          
+          # Fetch all branches from remote
+          git fetch origin
+          
+          # Check if branch exists on remote
+          if git ls-remote --heads origin "$TARGET_BRANCH" | grep -q "$TARGET_BRANCH"; then
+            echo "✅ Branch '$TARGET_BRANCH' already exists"
+          else
+            echo "📝 Branch '$TARGET_BRANCH' does not exist, creating it from main..."
+            git checkout -b "$TARGET_BRANCH"
+            git push origin "$TARGET_BRANCH"
+            echo "✅ Branch '$TARGET_BRANCH' created"
+          fi
+          
       - name: Create Pull Request to version branch
         if: always()
         uses: peter-evans/create-pull-request@v6
