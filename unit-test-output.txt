@@ -1,0 +1,26 @@
+
+> windmill-mcp@0.1.0 test:unit
+> vitest run tests/unit
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90m/home/runner/work/windmill-mcp/windmill-mcp[39m
+
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mJob Operations[2m > [22mshould list jobs
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mJob Operations[2m > [22mshould get a specific job
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mJob Operations[2m > [22mshould run a script
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mJob Operations[2m > [22mshould record API calls
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mScript Operations[2m > [22mshould list scripts
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mScript Operations[2m > [22mshould get a specific script
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mWorkflow Operations[2m > [22mshould list workflows
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mWorkflow Operations[2m > [22mshould get a specific workflow
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mCall History[2m > [22mshould track all API calls
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMockWindmillClient[2m > [22mCall History[2m > [22mshould clear call history
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMCP Tool Helpers[2m > [22mshould create mock tool request
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMCP Tool Helpers[2m > [22mshould create mock tool response
+ [32m✓[39m tests/unit/mocks.test.js[2m > [22mMCP Tool Helpers[2m > [22mshould create error response
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m13 passed[39m[22m[90m (13)[39m
+[2m   Start at [22m 04:42:11
+[2m   Duration [22m 308ms[2m (transform 30ms, setup 11ms, collect 18ms, tests 9ms, environment 0ms, prepare 72ms)[22m
+
