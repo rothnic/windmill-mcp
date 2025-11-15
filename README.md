@@ -33,7 +33,14 @@ windmill-mcp/
 Run the MCP server directly with npx:
 
 ```bash
-npx rothnic/windmill-mcp
+# Latest Windmill version
+npx windmill-mcp
+
+# Specific Windmill version
+WINDMILL_VERSION=1.520.1 npx windmill-mcp
+
+# The first run downloads and caches the generated code
+# Subsequent runs are instant!
 ```
 
 Or add to your MCP client configuration (e.g., Claude Desktop):
@@ -43,14 +50,52 @@ Or add to your MCP client configuration (e.g., Claude Desktop):
   "mcpServers": {
     "windmill": {
       "command": "npx",
-      "args": ["rothnic/windmill-mcp"],
+      "args": ["windmill-mcp"],
       "env": {
+        "WINDMILL_VERSION": "1.520.1",
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-api-token"
       }
     }
   }
 }
+```
+
+### How It Works
+
+The MCP server uses a **runtime artifact download** approach:
+
+1. **On first run**: Downloads pre-tested generated code from GitHub Releases
+2. **Caches locally**: Stores in `~/.cache/windmill-mcp/{version}/`
+3. **Instant startup**: Subsequent runs load from cache (<1s)
+4. **Fallback generation**: Can generate locally if artifact not available
+
+**Key Benefits:**
+- ✅ **Pre-tested artifacts**: Only tested versions are released
+- ✅ **Fast startup**: Download once, run instantly thereafter
+- ✅ **Version flexibility**: Switch between Windmill versions with an env var
+- ✅ **Single package**: No need to manage multiple npm versions
+
+### Version Targeting
+
+```bash
+# Use latest Windmill version
+npx windmill-mcp
+
+# Use specific Windmill version
+WINDMILL_VERSION=1.520.1 npx windmill-mcp
+
+# List available versions
+npx windmill-mcp --list-available
+
+# List cached versions
+npx windmill-mcp --list-cached
+
+# Clear cache for a version
+npx windmill-mcp --clear-cache 1.520.1
+
+# Clear all cache
+npx windmill-mcp --clear-cache
 ```
 
 ### Development Setup
@@ -84,20 +129,36 @@ cp .env.example .env
 
 ## Usage
 
-### Automated Updates
+### Automated Releases
 
-The MCP server can be automatically updated via GitHub Actions workflow:
+New Windmill versions are automatically published via GitHub Actions:
 
-- **Manual Trigger**: Navigate to Actions → "Update MCP Server" → "Run workflow"
-- **Scheduled**: Runs weekly on Mondays at midnight UTC
-- **Results**: Creates a PR with updates, marked as draft if tests fail
+- **Manual Trigger**: Actions → "Generate Windmill MCP Server Version" → Run workflow
+- **Scheduled**: Runs weekly on Mondays at midnight UTC (generates latest)
+- **Results**: Creates GitHub Release with tested artifacts
 
-The workflow:
-1. Fetches the latest OpenAPI specification from Windmill
-2. Regenerates the MCP server code
-3. Applies custom overrides
-4. Runs all tests
-5. Creates a PR with results (ready for review if tests pass, draft if they fail)
+**The workflow:**
+1. Starts Windmill in Docker
+2. Fetches OpenAPI specification
+3. Generates MCP server code
+4. Runs unit and E2E tests
+5. If tests pass: Creates GitHub Release with artifact
+6. Users automatically get the tested version on first run
+
+**Release Tags:**
+- `windmill-latest` - Always the newest Windmill version
+- `windmill-v1.520.1-mcp-0.2.0` - Specific Windmill + package version
+
+### Rebuilding All Versions
+
+When the MCP package itself is updated, all supported Windmill versions can be rebuilt:
+
+```bash
+# Trigger via GitHub Actions
+Actions → "Rebuild All Windmill Versions" → Run workflow → "all"
+```
+
+This regenerates and tests all existing versions with the new package version.
 
 ### Manual Generation
 

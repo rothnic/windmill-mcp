@@ -2,13 +2,16 @@
   "name": "windmill-mcp",
   "version": "0.1.0",
   "description": "MCP server for Windmill API generated from OpenAPI specification",
-  "main": "src/index.js",
+  "main": "src/runtime/index.js",
   "type": "module",
   "bin": {
-    "windmill-mcp": "./src/index.js"
+    "windmill-mcp": "./src/runtime/index.js"
   },
   "files": [
-    "src/",
+    "src/runtime/",
+    "generator/",
+    "scripts/",
+    "overrides/",
     "README.md",
     "LICENSE"
   ],
@@ -58,7 +61,8 @@
   "homepage": "https://github.com/rothnic/windmill-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^0.5.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "tar": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

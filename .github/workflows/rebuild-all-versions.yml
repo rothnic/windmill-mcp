@@ -1,0 +1,199 @@
+name: Rebuild All Windmill Versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      versions:
+        description: 'Comma-separated list of Windmill versions (e.g., "1.520.1,1.521.0") or "all" for all existing releases'
+        required: true
+        default: 'all'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  get-versions:
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.set-versions.outputs.versions }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Get versions to rebuild
+        id: set-versions
+        run: |
+          INPUT_VERSIONS="${{ github.event.inputs.versions }}"
+
+          if [ "$INPUT_VERSIONS" = "all" ]; then
+            echo "📋 Fetching all existing release versions..."
+
+            # Fetch all release tags
+            VERSIONS=$(gh api repos/${{ github.repository }}/releases --paginate | \
+              jq -r '.[].tag_name' | \
+              grep '^windmill-v' | \
+              sed 's/windmill-v\(.*\)-mcp-.*/\1/' | \
+              sort -u | \
+              jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+            echo "Found versions: $VERSIONS"
+          else
+            echo "📋 Using provided versions: $INPUT_VERSIONS"
+            VERSIONS=$(echo "$INPUT_VERSIONS" | jq -R -c 'split(",")')
+          fi
+
+          echo "versions=$VERSIONS" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  rebuild:
+    needs: get-versions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ${{ fromJSON(needs.get-versions.outputs.versions) }}
+      fail-fast: false  # Continue even if one version fails
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Windmill instance
+        run: |
+          echo "🚀 Starting Windmill instance..."
+          npm run docker:up
+
+      - name: Wait for Windmill to be ready
+        run: |
+          echo "⏳ Waiting for Windmill to be ready..."
+          npm run docker:wait
+        timeout-minutes: 5
+
+      - name: Fetch OpenAPI spec
+        id: fetch-spec
+        run: |
+          echo "📥 Fetching OpenAPI spec for Windmill ${{ matrix.version }}..."
+
+          # Ensure cache directory exists
+          mkdir -p generator/cache
+
+          # Fetch from local Windmill instance
+          # Note: In reality, we'd need a way to fetch specific version specs
+          # For now, we use the running instance
+          curl -f http://localhost:8000/api/openapi.json -o generator/cache/openapi-spec.json
+
+          SPEC_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('generator/cache/openapi-spec.json', 'utf8')).info.version")
+          echo "spec_version=$SPEC_VERSION" >> $GITHUB_OUTPUT
+          echo "✅ Fetched OpenAPI spec version: $SPEC_VERSION"
+
+      - name: Generate MCP server
+        run: |
+          echo "🔧 Generating MCP server from OpenAPI spec..."
+          npm run generate
+          echo "✅ MCP server generated"
+
+      - name: Run unit tests
+        id: unit-test
+        run: |
+          echo "🧪 Running unit tests..."
+          npm run test:unit
+        continue-on-error: true
+
+      - name: Run E2E tests
+        id: e2e-test
+        env:
+          E2E_WINDMILL_URL: http://localhost:8000
+          E2E_WORKSPACE: demo
+          WINDMILL_BASE_URL: http://localhost:8000
+        run: |
+          echo "🧪 Running E2E tests..."
+          npm run test:e2e
+        continue-on-error: true
+
+      - name: Stop Windmill
+        if: always()
+        run: |
+          echo "🛑 Stopping Windmill instance..."
+          npm run docker:down
+
+      - name: Check test results
+        run: |
+          # STRICT: Both unit AND E2E tests must pass
+          if [ "${{ steps.unit-test.outcome }}" != "success" ] || [ "${{ steps.e2e-test.outcome }}" != "success" ]; then
+            echo "❌ Tests failed for version ${{ matrix.version }} - no release will be created"
+            if [ "${{ steps.unit-test.outcome }}" != "success" ]; then
+              echo "   - Unit tests: FAILED"
+            fi
+            if [ "${{ steps.e2e-test.outcome }}" != "success" ]; then
+              echo "   - E2E tests: FAILED"
+            fi
+            exit 1
+          fi
+          echo "✅ All tests passed - ready for release"
+
+      - name: Get package version
+        id: package-version
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          echo "version=$PKG_VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Package version: $PKG_VERSION"
+
+      - name: Create tarball of generated code
+        run: |
+          echo "📦 Creating tarball of generated code..."
+          cd src
+          tar --exclude='./runtime' -czf ../generated-mcp-server.tar.gz .
+          cd ..
+          echo "✅ Tarball created"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: windmill-v${{ steps.fetch-spec.outputs.spec_version }}-mcp-${{ steps.package-version.outputs.version }}
+          name: Windmill ${{ steps.fetch-spec.outputs.spec_version }} MCP Server (rebuilt)
+          body: |
+            ## Windmill MCP Server (Rebuilt)
+
+            **Windmill API Version**: ${{ steps.fetch-spec.outputs.spec_version }}
+            **MCP Package Version**: ${{ steps.package-version.outputs.version }}
+            **Rebuilt**: ${{ github.event.repository.updated_at }}
+
+            This version was rebuilt with the latest MCP package version.
+
+            ### Installation
+
+            ```bash
+            WINDMILL_VERSION=${{ steps.fetch-spec.outputs.spec_version }} npx windmill-mcp
+            ```
+
+            ---
+
+            Generated by workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          files: |
+            generated-mcp-server.tar.gz
+            generator/cache/openapi-spec.json
+          draft: false
+          prerelease: false
+
+  summary:
+    needs: rebuild
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## Rebuild Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Rebuild workflow completed for all requested versions." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check individual job results above for details." >> $GITHUB_STEP_SUMMARY

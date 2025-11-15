@@ -143,8 +143,9 @@ generator/cache/
 generator/temp/
 generator/logs/
 
-# Generated MCP server (only exists in version branches, not main)
-src/
+# Generated MCP server code (downloaded/generated at runtime, cached in user's home directory)
+src/generated/
+src/generated-temp/
 
 # Test artifacts
 tests/fixtures/temp/
