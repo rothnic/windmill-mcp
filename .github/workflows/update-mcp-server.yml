@@ -55,6 +55,9 @@ jobs:
         run: |
           echo "📥 Fetching OpenAPI spec from running Windmill instance..."
           
+          # Ensure cache directory exists
+          mkdir -p generator/cache
+          
           # Fetch from local Windmill instance
           curl -f http://localhost:8000/api/openapi.json -o generator/cache/openapi-spec.json
           
