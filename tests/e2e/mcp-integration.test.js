@@ -15,7 +15,6 @@
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { spawn } from 'child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import path from 'path';
@@ -89,7 +88,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('Tool Discovery', () => {
     it('should list available MCP tools', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/list' },
         { method: 'tools/list', params: {} }
       );
       
@@ -108,7 +106,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     
     it('should provide tool schemas', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/list' },
         { method: 'tools/list', params: {} }
       );
       
@@ -121,7 +118,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('Version Tool', () => {
     it('should get Windmill version through MCP', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -150,7 +146,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('Job Tools', () => {
     it('should list jobs through MCP and return valid data', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -181,7 +176,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     it('should query specific job data if jobs exist', async () => {
       // First, get list of jobs
       const listResponse = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -197,7 +191,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
         // Get details of first job
         const jobId = jobs[0].id;
         const getResponse = await mcpClient.request(
-          { method: 'tools/call' },
           {
             method: 'tools/call',
             params: {
@@ -232,7 +225,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     
     it('should list scripts through MCP and return valid data', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -276,7 +268,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     
     it('should list workflows through MCP and return valid data', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -308,7 +299,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('User and Workspace Tools', () => {
     it('should query current user information through MCP', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -332,7 +322,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     
     it('should list workspaces through MCP', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -364,7 +353,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('Resource Tools', () => {
     it('should list resources through MCP', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -396,7 +384,6 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
   describe('Error Handling', () => {
     it('should handle unknown tool gracefully', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
@@ -413,11 +400,10 @@ describe.skipIf(!isE2EEnabled)('MCP Server E2E Tests', () => {
     
     it('should handle missing required arguments', async () => {
       const response = await mcpClient.request(
-        { method: 'tools/call' },
         {
           method: 'tools/call',
           params: {
-            name: 'list_jobs',
+            name: 'listJobs',
             arguments: {}, // Missing workspace
           },
         }

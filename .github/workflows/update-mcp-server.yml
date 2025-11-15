@@ -173,7 +173,7 @@ jobs:
             
             ### Generation Process
             - ✅ Fetched OpenAPI spec from Windmill instance
-            - ✅ Generated MCP server with 490 tools
+            - ✅ Generated MCP server tools
             - ✅ Built TypeScript project
             
             ### Test Results
@@ -205,7 +205,6 @@ jobs:
             mcp-generation
             windmill-${{ steps.version.outputs.windmill_version }}
             ${{ steps.test.outputs.test_exit_code != '0' && 'tests-failing' || 'tests-passing' }}
-          create-when-empty: true
             
       - name: Upload artifacts
         if: always()
