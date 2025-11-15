@@ -92,7 +92,7 @@ async function main() {
   
   try {
     await runCommand('npx', [
-      'openapi-mcp-generator',
+      'openapi-mcp-generator@3.2.0',  // Pin to version that supports --transport
       '--input', CACHE_PATH,
       '--output', OUTPUT_DIR,
       '--server-name', 'windmill-mcp',

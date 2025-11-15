@@ -72,6 +72,38 @@ jobs:
           fi
           echo "✅ OpenAPI spec fetched successfully"
           
+      - name: Test MCP server generation
+        run: |
+          echo "Testing MCP server generation..."
+          npm run generate
+          
+          # Verify generation succeeded
+          if [ ! -d "src" ]; then
+            echo "❌ Generation failed - src/ directory not created"
+            exit 1
+          fi
+          
+          if [ ! -f "src/src/index.ts" ]; then
+            echo "❌ Generation failed - index.ts not found"
+            exit 1
+          fi
+          
+          echo "✅ MCP server generated successfully"
+          
+      - name: Test building generated server
+        run: |
+          echo "Testing build of generated MCP server..."
+          cd src
+          npm install
+          npm run build
+          
+          if [ ! -f "build/index.js" ]; then
+            echo "❌ Build failed - build/index.js not found"
+            exit 1
+          fi
+          
+          echo "✅ Generated MCP server builds successfully"
+          
   test-summary:
     runs-on: ubuntu-latest
     needs: [unit-tests, generator-validation]
