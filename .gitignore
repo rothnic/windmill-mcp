@@ -146,6 +146,9 @@ generator/logs/
 # Generated MCP server code (downloaded/generated at runtime, cached in user's home directory)
 src/generated/
 src/generated-temp/
+# Ignore all generated files in src/ except runtime
+src/*
+!src/runtime/
 
 # Test artifacts
 tests/fixtures/temp/
