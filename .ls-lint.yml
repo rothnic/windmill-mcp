@@ -1,17 +1,18 @@
 ls:
-  # Default rules for root directory (override in subdirs as needed)
+  # Root directory - specific uppercase files allowed
   .js: regex:^vitest\.config$
   .json: regex:^package$
   .yml: regex:^\.ls-lint$
   .md: regex:^(README|CHANGELOG|CONTRIBUTING|PROJECT_STATUS|AGENTS)$
   .example: regex:^\.env$
   .ignore: regex:^(\.gitignore|\.npmignore)$
+  .dir: regex:^([a-z][a-z0-9-]*|\.github|\.husky)$ # kebab-case or conventional dot-directories
 
   # GitHub workflows
   .github/workflows:
     .yml: kebab-case
     .yaml: kebab-case
-    .md: regex:^README$
+    .md: regex:^(README|AGENTS)$
 
   # Source directories
   src:
@@ -19,6 +20,7 @@ ls:
     .js: kebab-case
     .ts: kebab-case
     .json: kebab-case
+    .md: regex:^([a-z][a-z0-9-]*|README|AGENTS)$
 
   # Test directories
   tests:
@@ -26,14 +28,16 @@ ls:
     .js: kebab-case
     .ts: kebab-case
     .json: kebab-case
+    .md: regex:^([a-z][a-z0-9-]*|README|AGENTS)$
 
-  # Documentation (kebab-case OR specific uppercase files)
+  # Documentation (allow CONTRIBUTING in addition to README/AGENTS)
   docs:
     .dir: kebab-case
-    .md: regex:^([a-z][a-z0-9-]*|README|CONTRIBUTING)$
+    .md: regex:^([a-z][a-z0-9-]*|README|CONTRIBUTING|AGENTS)$
 
 ignore:
   - .git
+  - .husky/_ # Husky internal directory
   - node_modules
   - dist
   - build
