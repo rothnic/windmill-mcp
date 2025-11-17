@@ -67,13 +67,14 @@ windmill-mcp/
 │   ├── utils/             # Test utilities & mocks
 │   ├── setup.js           # Test setup
 │   └── config.json        # Test configuration
-├── Documentation
-│   ├── README.md          # Main documentation
-│   ├── QUICKSTART.md      # Getting started guide
-│   ├── TESTING.md         # Testing guide
-│   ├── CONTRIBUTING.md    # Contribution guidelines
-│   ├── CHANGELOG.md       # Version history
-│   └── LICENSE            # MIT License
+├── docs/                  # Documentation
+│   ├── quickstart.md      # Getting started guide
+│   ├── testing.md         # Testing guide
+│   └── architecture-verification.md
+├── README.md              # Main documentation
+├── CONTRIBUTING.md        # Contribution guidelines
+├── CHANGELOG.md           # Version history
+├── LICENSE                # MIT License
 └── Configuration
     ├── package.json       # npm configuration with bin entry
     ├── vitest.config.js   # Test configuration
@@ -407,8 +408,8 @@ The project includes an automated workflow for keeping the MCP server up to date
 ## Support & Resources
 
 - **Documentation**: See [README.md](README.md)
-- **Quick Start**: See [QUICKSTART.md](QUICKSTART.md)
-- **Testing Guide**: See [TESTING.md](TESTING.md)
+- **Quick Start**: See [docs/quickstart.md](docs/quickstart.md)
+- **Testing Guide**: See [docs/testing.md](docs/testing.md)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Project Plan**: See [.github/agents/PROJECT_PLAN.md](.github/agents/PROJECT_PLAN.md)
 - **Sprints**: See [.github/agents/SPRINTS.md](.github/agents/SPRINTS.md)

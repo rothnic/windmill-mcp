@@ -74,7 +74,7 @@ export E2E_WORKSPACE=admins
 npm run test:e2e
 ```
 
-See [TESTING.md](TESTING.md) for comprehensive testing documentation.
+See [TESTING.md](docs/testing.md) for comprehensive testing documentation.
 
 ### Project Structure
 

@@ -5,7 +5,7 @@
 
 Provides complete [Windmill](https://windmill.dev) API access through MCP (Model Context Protocol) tools by leveraging Windmill's OpenAPI specification.
 
-> 📘 **New to this project?** Check out the [Quick Start Guide](QUICKSTART.md) for a step-by-step introduction.
+> 📘 **New to this project?** Check out the [Quick Start Guide](docs/quickstart.md) for a step-by-step introduction.
 
 ## Overview
 
@@ -192,7 +192,7 @@ This will open a web interface where you can:
 - Test tool invocations
 - Debug any issues
 
-See [TESTING.md](TESTING.md) for comprehensive testing documentation.
+See [TESTING.md](docs/testing.md) for comprehensive testing documentation.
 
 #### Regenerating the MCP Server
 
