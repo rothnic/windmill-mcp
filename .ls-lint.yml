@@ -13,9 +13,9 @@ ls:
     .yaml: kebab-case
     .md: regex:^README$
 
-  # GitHub agents
+  # GitHub agents directory (only kebab-case agent profiles or AGENTS.md helper)
   .github/agents:
-    .md: regex:^([A-Z_]+|[a-z][a-z0-9-]*)$
+    .md: regex:^(AGENTS|README|[a-z][a-z0-9-]*\.agent)$
 
   # Source directories
   src:
