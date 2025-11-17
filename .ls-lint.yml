@@ -3,7 +3,7 @@ ls:
   .js: regex:^vitest\.config$
   .json: regex:^package$
   .yml: regex:^\.ls-lint$
-  .md: regex:^(README|CHANGELOG|CONTRIBUTING|PROJECT_STATUS)$
+  .md: regex:^(README|CHANGELOG|CONTRIBUTING|PROJECT_STATUS|AGENTS)$
   .example: regex:^\.env$
   .ignore: regex:^(\.gitignore|\.npmignore)$
 
@@ -12,10 +12,6 @@ ls:
     .yml: kebab-case
     .yaml: kebab-case
     .md: regex:^README$
-
-  # GitHub agents directory (only kebab-case agent profiles or AGENTS.md helper)
-  .github/agents:
-    .md: regex:^(AGENTS|README|[a-z][a-z0-9-]*\.agent)$
 
   # Source directories
   src:

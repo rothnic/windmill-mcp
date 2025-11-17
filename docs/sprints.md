@@ -289,5 +289,5 @@ For a task to be considered complete:
 ## Resources
 
 - [project-plan.md](./project-plan.md) - Overall project plan
-- [AGENTS.md](../.github/agents/AGENTS.md) - Agent configurations
+- [AGENTS.md](../AGENTS.md) - Agent configurations
 - [Main README](../README.md) - User documentation
