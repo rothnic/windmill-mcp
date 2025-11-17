@@ -4,12 +4,6 @@
  * Artifact Downloader for Windmill MCP Server
  *
  * Downloads pre-generated MCP server artifacts from GitHub Releases.
- * 
- * Note: GitHub API calls are subject to rate limiting:
- * - Unauthenticated requests: 60 requests/hour per IP
- * - Authenticated requests: 5,000 requests/hour
- * 
- * Rate limit errors will be reported with reset time information.
  */
 
 import https from 'https';
@@ -88,8 +82,6 @@ async function fetchReleaseByTag(tag) {
  * @returns {Promise<Object>} Parsed JSON response
  */
 function fetchJson(url) {
-  const MAX_RESPONSE_SIZE = 10 * 1024 * 1024; // 10MB limit for JSON responses
-  
   return new Promise((resolve, reject) => {
     const options = {
       headers: {
@@ -105,14 +97,6 @@ function fetchJson(url) {
         reject(error);
         return;
       }
-      
-      // Check for rate limit errors
-      if (res.statusCode === 403 && res.headers['x-ratelimit-remaining'] === '0') {
-        const resetTime = res.headers['x-ratelimit-reset'];
-        const resetDate = resetTime ? new Date(parseInt(resetTime) * 1000).toISOString() : 'unknown';
-        reject(new Error(`GitHub API rate limit exceeded. Resets at: ${resetDate}. Consider authenticating for higher limits.`));
-        return;
-      }
 
       if (res.statusCode !== 200) {
         reject(new Error(`HTTP ${res.statusCode}: ${res.statusMessage}`));
@@ -120,20 +104,7 @@ function fetchJson(url) {
       }
 
       let data = '';
-      let dataSize = 0;
-      
-      res.on('data', (chunk) => {
-        dataSize += chunk.length;
-        
-        if (dataSize > MAX_RESPONSE_SIZE) {
-          res.destroy();
-          reject(new Error(`Response size exceeds maximum allowed size of ${MAX_RESPONSE_SIZE / 1024 / 1024}MB`));
-          return;
-        }
-        
-        data += chunk;
-      });
-      
+      res.on('data', (chunk) => data += chunk);
       res.on('end', () => {
         try {
           resolve(JSON.parse(data));
@@ -151,21 +122,11 @@ function fetchJson(url) {
  * @returns {Promise<Buffer>} File content
  */
 function downloadFile(url) {
-  const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit
-  
   return new Promise((resolve, reject) => {
     https.get(url, (res) => {
-      // Follow redirects with validation
+      // Follow redirects
       if (res.statusCode === 302 || res.statusCode === 301) {
-        const redirectUrl = res.headers.location;
-        
-        // Validate redirect URL
-        if (!redirectUrl || !redirectUrl.startsWith('https://')) {
-          reject(new Error('Invalid redirect: only HTTPS URLs are allowed'));
-          return;
-        }
-        
-        return downloadFile(redirectUrl).then(resolve, reject);
+        return downloadFile(res.headers.location).then(resolve, reject);
       }
 
       if (res.statusCode !== 200) {
@@ -174,20 +135,7 @@ function downloadFile(url) {
       }
 
       const chunks = [];
-      let downloadedSize = 0;
-      
-      res.on('data', (chunk) => {
-        downloadedSize += chunk.length;
-        
-        if (downloadedSize > MAX_FILE_SIZE) {
-          res.destroy();
-          reject(new Error(`File size exceeds maximum allowed size of ${MAX_FILE_SIZE / 1024 / 1024}MB`));
-          return;
-        }
-        
-        chunks.push(chunk);
-      });
-      
+      res.on('data', (chunk) => chunks.push(chunk));
       res.on('end', () => resolve(Buffer.concat(chunks)));
     }).on('error', reject);
   });

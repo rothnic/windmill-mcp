@@ -30,12 +30,7 @@ async function main() {
 
   // Handle CLI commands
   if (args.includes('--clear-cache')) {
-    const clearCacheIndex = args.indexOf('--clear-cache');
-    const version = args[clearCacheIndex + 1];
-    if (version && version.startsWith('-')) {
-      console.error('❌ Please provide a version to clear or omit for all. Usage: windmill-mcp --clear-cache [version]');
-      process.exit(1);
-    }
+    const version = args[args.indexOf('--clear-cache') + 1];
     await clearCache(version);
     return;
   }
@@ -61,14 +56,6 @@ async function main() {
 
   // Get Windmill version from environment variable
   const windmillVersion = process.env.WINDMILL_VERSION || 'latest';
-  
-  // Validate windmillVersion format
-  if (windmillVersion !== 'latest' && !/^[\d.]+$/.test(windmillVersion)) {
-    console.error(`❌ Invalid WINDMILL_VERSION format: ${windmillVersion}`);
-    console.error(`   Expected: semantic version (e.g., "1.520.1") or "latest"`);
-    process.exit(1);
-  }
-  
   const packageJson = require('../../package.json');
   const packageVersion = packageJson.version;
 

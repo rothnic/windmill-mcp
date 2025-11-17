@@ -9,7 +9,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
-import tar from 'tar';
+import { createWriteStream } from 'fs';
+import { pipeline } from 'stream/promises';
+import * as tar from 'tar';
 
 /**
  * Get cache directory for a specific Windmill version
@@ -17,7 +19,8 @@ import tar from 'tar';
  * @returns {string} Cache directory path
  */
 export function getCacheDir(windmillVersion) {
-  const baseDir = getBaseCacheDir();
+  const baseDir =
+    process.env.WINDMILL_MCP_CACHE_DIR || path.join(os.homedir(), '.cache', 'windmill-mcp');
   return path.join(baseDir, windmillVersion);
 }
 
@@ -60,20 +63,6 @@ export async function extractToCache(tarballBuffer, windmillVersion) {
       file: tempTarball,
       cwd: cacheDir,
       strip: 1, // Remove top-level directory from tarball
-      strict: true,
-      filter: (path, entry) => {
-        // Reject absolute paths or paths with '..'
-        if (path.includes('..') || path.startsWith('/') || path.startsWith('\\')) {
-          console.warn(`⚠️ Skipping suspicious tar entry: ${path}`);
-          return false;
-        }
-        // Optionally, only allow files and directories (not device files, etc.)
-        if (entry.type && !['File', 'Directory', 'SymbolicLink'].includes(entry.type)) {
-          console.warn(`⚠️ Skipping unsupported tar entry type (${entry.type}): ${path}`);
-          return false;
-        }
-        return true;
-      },
     });
 
     console.log(`✅ Extracted to cache: ${cacheDir}`);
@@ -115,15 +104,6 @@ export function getCachedCodePath(windmillVersion) {
 }
 
 /**
- * Get base cache directory
- * @returns {string} Base cache directory path
- */
-function getBaseCacheDir() {
-  return process.env.WINDMILL_MCP_CACHE_DIR ||
-         path.join(os.homedir(), '.cache', 'windmill-mcp');
-}
-
-/**
  * Clear cache for a specific version or all versions
  * @param {string} [windmillVersion] - Windmill version to clear, or undefined for all
  * @returns {Promise<void>}
@@ -134,7 +114,7 @@ export async function clearCache(windmillVersion) {
     await fs.rm(cacheDir, { recursive: true, force: true });
     console.log(`🗑️  Cleared cache for version: ${windmillVersion}`);
   } else {
-    const baseDir = getBaseCacheDir();
+    const baseDir = path.join(os.homedir(), '.cache', 'windmill-mcp');
     await fs.rm(baseDir, { recursive: true, force: true });
     console.log(`🗑️  Cleared all cache`);
   }
@@ -145,13 +125,11 @@ export async function clearCache(windmillVersion) {
  * @returns {Promise<string[]>} List of cached version strings
  */
 export async function listCachedVersions() {
-  const baseDir = getBaseCacheDir();
+  const baseDir = path.join(os.homedir(), '.cache', 'windmill-mcp');
 
   try {
     const entries = await fs.readdir(baseDir, { withFileTypes: true });
-    return entries
-      .filter(entry => entry.isDirectory())
-      .map(entry => entry.name);
+    return entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
   } catch {
     return [];
   }
