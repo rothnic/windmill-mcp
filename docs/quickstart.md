@@ -58,6 +58,8 @@ Replace `/absolute/path/to/windmill-mcp` with the actual path to your cloned rep
 
 ### Using with OpenCode
 
+For local development, copy `opencode.jsonc.example` to `opencode.jsonc` and customize it with your paths and credentials.
+
 Add to your project's `.opencode/opencode.jsonc`:
 
 ```jsonc
@@ -78,6 +80,8 @@ Add to your project's `.opencode/opencode.jsonc`:
   },
 }
 ```
+
+**Note**: `opencode.jsonc` is ignored by git to protect sensitive credentials. Always use `opencode.jsonc.example` as a reference.
 
 ## For Developers
 

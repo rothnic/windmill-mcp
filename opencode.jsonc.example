@@ -1,0 +1,21 @@
+{
+  // Example OpenCode MCP configuration for windmill-mcp
+  // Copy this to opencode.jsonc and customize for your local environment
+  "mcp": {
+    "windmill-dev": {
+      "type": "local",
+      "command": [
+        "node",
+        "/path/to/your/windmill-mcp/build/src/index.js"
+      ],
+      "environment": {
+        // Your Windmill instance URL (e.g., https://app.windmill.dev or http://localhost:8000)
+        "WINDMILL_BASE_URL": "http://localhost:8000",
+        // Your Windmill API token (get from Settings > Tokens)
+        "WINDMILL_API_TOKEN": "your-api-token-here"
+      },
+      "enabled": true
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}
