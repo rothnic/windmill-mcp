@@ -1,0 +1,50 @@
+ls:
+  # Default rules for root directory (override in subdirs as needed)
+  .js: regex:^vitest\.config$
+  .json: regex:^package$
+  .yml: regex:^\.ls-lint$
+  .md: regex:^(README|CHANGELOG|CONTRIBUTING|PROJECT_STATUS)$
+  .example: regex:^\.env$
+  .ignore: regex:^(\.gitignore|\.npmignore)$
+
+  # GitHub workflows
+  .github/workflows:
+    .yml: kebab-case
+    .yaml: kebab-case
+    .md: regex:^README$
+
+  # GitHub agents
+  .github/agents:
+    .md: regex:^([A-Z_]+|[a-z][a-z0-9-]*)$
+
+  # Source directories
+  src:
+    .dir: kebab-case
+    .js: kebab-case
+    .ts: kebab-case
+    .json: kebab-case
+
+  # Test directories
+  tests:
+    .dir: kebab-case
+    .js: kebab-case
+    .ts: kebab-case
+    .json: kebab-case
+
+  # Documentation (kebab-case OR specific uppercase files)
+  docs:
+    .dir: kebab-case
+    .md: regex:^([a-z][a-z0-9-]*|README|CONTRIBUTING)$
+
+ignore:
+  - .git
+  - node_modules
+  - dist
+  - build
+  - cache
+  - coverage
+  - .DS_Store
+  - .env
+  - .env.local
+  - package-lock.json
+  - npm-debug.log

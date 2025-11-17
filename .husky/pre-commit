@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Check directory structure before committing
+npm run lint:structure
+
+# Optionally run tests (commented out by default as it may be slow)
+# npm test
