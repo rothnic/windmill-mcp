@@ -84,7 +84,7 @@ See [TESTING.md](docs/testing.md) for comprehensive testing documentation.
 - `build/` - **Generated MCP server code** (NOT committed to git, generated locally or downloaded)
 - `cache/` - Cached OpenAPI specifications (NOT committed to git)
 - `tests/` - Test suite
-- `.github/agents/` - Project planning and agent configurations
+- `.github/agents/` - Agent configurations
 
 ### Important: Generated Code and Git
 
@@ -258,7 +258,7 @@ with fallback to backup URL.
 2. Add tests for new features
 3. Ensure all tests pass
 4. Update README.md if adding user-facing features
-5. Update PROJECT_PLAN.md or SPRINTS.md if relevant
+5. Update docs/project-plan.md or docs/sprints.md if relevant
 6. Submit your PR with a clear description
 
 ### PR Description Template
@@ -349,13 +349,13 @@ npm run test:live
 
 - Update README.md for user-facing changes
 - Update inline code comments for complex logic
-- Update PROJECT_PLAN.md for architectural changes
-- Update SPRINTS.md for sprint-related work
+- Update docs/project-plan.md for architectural changes
+- Update docs/sprints.md for sprint-related work
 
 ## Getting Help
 
 - Check existing issues and discussions
-- Review PROJECT_PLAN.md and SPRINTS.md
+- Review docs/project-plan.md and docs/sprints.md
 - Ask questions in GitHub Discussions
 - Tag maintainers in issues if stuck
 
@@ -376,6 +376,6 @@ Contributors will be acknowledged in:
 
 - GitHub contributors list
 - Release notes for significant contributions
-- PROJECT_PLAN.md for major features
+- docs/project-plan.md for major features
 
 Thank you for contributing! 🎉

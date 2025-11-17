@@ -35,10 +35,8 @@ The Windmill MCP Server generator project foundation is complete with:
 ```
 windmill-mcp/
 ├── .github/
-│   ├── agents/              # Project planning & agent configs
-│   │   ├── AGENTS.md       # Agent roles and workflows
-│   │   ├── PROJECT_PLAN.md # Project roadmap
-│   │   └── SPRINTS.md      # Sprint tracking
+│   ├── agents/              # Agent configs and helpers
+│   │   └── AGENTS.md       # Agent roles and workflows
 │   └── workflows/          # GitHub Actions workflows
 │       └── update-mcp-server.yml # Automated update workflow
 ├── src/
@@ -411,8 +409,8 @@ The project includes an automated workflow for keeping the MCP server up to date
 - **Quick Start**: See [docs/quickstart.md](docs/quickstart.md)
 - **Testing Guide**: See [docs/testing.md](docs/testing.md)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Project Plan**: See [.github/agents/PROJECT_PLAN.md](.github/agents/PROJECT_PLAN.md)
-- **Sprints**: See [.github/agents/SPRINTS.md](.github/agents/SPRINTS.md)
+- **Project Plan**: See [docs/project-plan.md](docs/project-plan.md)
+- **Sprints**: See [docs/sprints.md](docs/sprints.md)
 
 ## Conclusion
 

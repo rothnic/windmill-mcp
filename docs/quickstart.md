@@ -301,9 +301,9 @@ npm run fetch-spec
 
 ## Next Steps
 
-- Read the [full README](README.md) for comprehensive documentation
-- Check [CONTRIBUTING.md](CONTRIBUTING.md) if you want to contribute
-- Review [PROJECT_PLAN.md](.github/agents/PROJECT_PLAN.md) for project roadmap
+- Read the [full README](../README.md) for comprehensive documentation
+- Check [CONTRIBUTING.md](../CONTRIBUTING.md) if you want to contribute
+- Review [project-plan.md](project-plan.md) for project roadmap
 - Join discussions on GitHub for questions
 
 ## Getting Help

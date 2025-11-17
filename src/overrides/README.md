@@ -233,6 +233,6 @@ git diff src/
 ## Getting Help
 
 - Check examples in this README
-- Review PROJECT_PLAN.md for override strategy
+- Review docs/project-plan.md for override strategy
 - Ask in GitHub Discussions
 - See CONTRIBUTING.md for contribution process

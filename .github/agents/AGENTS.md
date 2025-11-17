@@ -9,9 +9,11 @@ This project uses AI agents to assist with development, maintenance, and testing
 ## Agent Roles
 
 ### 1. Generator Agent
+
 **Specialty**: OpenAPI specification processing and MCP server generation
 
 **Responsibilities**:
+
 - Fetch latest Windmill OpenAPI specifications
 - Execute openapi-mcp-generator with proper configuration
 - Handle generation errors and edge cases
@@ -19,11 +21,13 @@ This project uses AI agents to assist with development, maintenance, and testing
 - Validate generated output
 
 **Key Files**:
+
 - `generator/config.json`
 - `generator/fetch-spec.js`
 - `generator/generate.js`
 
 **Commands**:
+
 ```bash
 npm run fetch-spec
 npm run generate
@@ -32,9 +36,11 @@ npm run generate
 ---
 
 ### 2. Override Management Agent
+
 **Specialty**: Custom code preservation and merge strategies
 
 **Responsibilities**:
+
 - Apply custom overrides to generated code
 - Detect and resolve merge conflicts
 - Maintain override directory structure
@@ -42,11 +48,13 @@ npm run generate
 - Document override patterns
 
 **Key Files**:
+
 - `overrides/**/*`
 - `scripts/apply-overrides.js`
 - `scripts/validate-overrides.js`
 
 **Commands**:
+
 ```bash
 npm run apply-overrides
 npm run validate-overrides
@@ -55,9 +63,11 @@ npm run validate-overrides
 ---
 
 ### 3. Testing Agent
+
 **Specialty**: Test creation and execution against Windmill instances
 
 **Responsibilities**:
+
 - Create and maintain test suites
 - Execute tests against live Windmill instances
 - Generate test reports
@@ -65,11 +75,13 @@ npm run validate-overrides
 - Maintain test fixtures and utilities
 
 **Key Files**:
+
 - `tests/**/*`
 - `tests/utils/windmill-client.js`
 - `tests/config.js`
 
 **Commands**:
+
 ```bash
 npm test
 npm run test:integration
@@ -79,27 +91,32 @@ npm run test:live
 ---
 
 ### 4. Documentation Agent
+
 **Specialty**: Documentation maintenance and updates
 
 **Responsibilities**:
+
 - Keep README.md up to date
 - Maintain API documentation
-- Update PROJECT_PLAN.md and SPRINTS.md
+- Update `docs/project-plan.md` and `docs/sprints.md`
 - Create tutorials and guides
 - Ensure documentation accuracy
 
 **Key Files**:
+
 - `README.md`
-- `.github/agents/PROJECT_PLAN.md`
-- `.github/agents/SPRINTS.md`
+- `docs/project-plan.md`
+- `docs/sprints.md`
 - `docs/**/*`
 
 ---
 
 ### 5. Quality Assurance Agent
+
 **Specialty**: Code quality, linting, and best practices
 
 **Responsibilities**:
+
 - Run linters and formatters
 - Ensure code style consistency
 - Validate configuration files
@@ -107,6 +124,7 @@ npm run test:live
 - Performance monitoring
 
 **Commands**:
+
 ```bash
 npm run lint
 npm run format
@@ -118,6 +136,7 @@ npm run validate
 ## Agent Workflows
 
 ### Generation Workflow
+
 ```mermaid
 graph TD
     A[Trigger Generation] --> B[Generator Agent: Fetch OpenAPI Spec]
@@ -130,6 +149,7 @@ graph TD
 ```
 
 ### Testing Workflow
+
 ```mermaid
 graph TD
     A[Code Change] --> B[QA Agent: Lint Code]
@@ -146,7 +166,9 @@ graph TD
 ## Agent Coordination
 
 ### Sequential Tasks
+
 When tasks must be completed in order:
+
 1. Generator Agent generates code
 2. Override Agent applies customizations
 3. QA Agent validates code quality
@@ -154,7 +176,9 @@ When tasks must be completed in order:
 5. Documentation Agent updates docs
 
 ### Parallel Tasks
+
 When tasks can be done simultaneously:
+
 - Testing Agent runs different test suites in parallel
 - QA Agent checks multiple file types concurrently
 - Documentation Agent updates multiple docs
@@ -166,6 +190,7 @@ When tasks can be done simultaneously:
 ### For All Agents
 
 **Do**:
+
 - Follow existing code patterns and conventions
 - Update relevant documentation
 - Run tests before committing
@@ -173,6 +198,7 @@ When tasks can be done simultaneously:
 - Ask for clarification when uncertain
 
 **Don't**:
+
 - Make breaking changes without discussion
 - Skip tests
 - Ignore linter warnings
@@ -182,6 +208,7 @@ When tasks can be done simultaneously:
 ### Communication
 
 Agents should communicate through:
+
 - Commit messages (for code changes)
 - Pull request descriptions (for reviews)
 - Issue comments (for bugs/features)
@@ -218,6 +245,7 @@ RUN_TESTS_ON_GENERATE=true
 ### Agent-Specific Settings
 
 Store in respective config files:
+
 - Generator: `generator/config.json`
 - Testing: `tests/config.json`
 - Overrides: `overrides/config.json`
@@ -229,26 +257,31 @@ Store in respective config files:
 ### Success Metrics per Agent
 
 **Generator Agent**:
+
 - Generation success rate: > 95%
 - Time to generate: < 5 minutes
 - Breaking changes detected: 0
 
 **Override Agent**:
+
 - Override success rate: 100%
 - Conflicts auto-resolved: > 80%
 - Manual intervention needed: < 20%
 
 **Testing Agent**:
+
 - Test pass rate: > 95%
 - Test coverage: > 80%
 - False positives: < 5%
 
 **Documentation Agent**:
+
 - Documentation completeness: 100%
 - Outdated docs: 0
 - Broken links: 0
 
 **QA Agent**:
+
 - Lint errors: 0
 - Security issues: 0
 - Code smells: < 10
@@ -260,21 +293,25 @@ Store in respective config files:
 ### Common Agent Issues
 
 **Generator fails to fetch spec**:
+
 - Check OPENAPI_SPEC_URL is accessible
 - Verify network connectivity
 - Check for API changes
 
 **Override conflicts**:
+
 - Review conflict files in `overrides/conflicts/`
 - Manually merge if needed
 - Update override patterns
 
 **Tests fail on live instance**:
+
 - Verify instance is running
 - Check credentials in .env
 - Ensure test data is valid
 
 **Documentation out of sync**:
+
 - Run `npm run validate-docs`
 - Review recent code changes
 - Update relevant sections
@@ -336,6 +373,7 @@ npm run docs:validate      # Check for broken links
 ## Version History
 
 **v1.0** (2025-11-11): Initial agent configuration
+
 - Defined 5 core agent roles
 - Established workflows and guidelines
 - Created coordination patterns
@@ -344,6 +382,6 @@ npm run docs:validate      # Check for broken links
 
 ## Related Files
 
-- [PROJECT_PLAN.md](./PROJECT_PLAN.md) - Project roadmap and phases
-- [SPRINTS.md](./SPRINTS.md) - Sprint planning and tracking
+- [project-plan.md](../../docs/project-plan.md) - Project roadmap and phases
+- [sprints.md](../../docs/sprints.md) - Sprint planning and tracking
 - [README.md](../../README.md) - Main project documentation

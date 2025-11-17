@@ -334,8 +334,8 @@ Tests are organized by endpoint category:
 
 Project planning, sprints, and agent configurations are maintained in `.github/agents/`. See:
 
-- `.github/agents/PROJECT_PLAN.md` - Overall project roadmap
-- `.github/agents/SPRINTS.md` - Sprint planning and tracking
+- `docs/project-plan.md` - Overall project roadmap
+- `docs/sprints.md` - Sprint planning and tracking
 - `.github/agents/AGENTS.md` - Agent configurations and responsibilities
 
 ## Contributing

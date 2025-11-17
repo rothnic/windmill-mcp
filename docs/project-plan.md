@@ -15,24 +15,28 @@ Create a maintainable, automated system for generating and maintaining an MCP se
 ## Key Components
 
 ### 1. Generator System
+
 - OpenAPI spec fetching mechanism
 - Integration with openapi-mcp-generator
 - Configuration management
 - Post-generation processing
 
 ### 2. Override System
+
 - Directory structure for custom overrides
 - Automated merge/apply mechanism
 - Conflict detection and resolution
 - Version tracking for overrides
 
 ### 3. Testing Infrastructure
+
 - Unit tests for generated code
 - Integration tests with live Windmill instance
 - Test data management
 - CI/CD integration
 
 ### 4. Documentation
+
 - User-facing README
 - Developer guides
 - API documentation
@@ -41,9 +45,11 @@ Create a maintainable, automated system for generating and maintaining an MCP se
 ## Phases
 
 ### Phase 1: Foundation (Current)
+
 **Goal**: Establish project structure and basic documentation
 
 Tasks:
+
 - ✅ Create project directory structure
 - ✅ Write comprehensive README
 - ✅ Set up agents files for planning
@@ -52,9 +58,11 @@ Tasks:
 - ⏳ Create example .env file
 
 ### Phase 2: Generator Implementation
+
 **Goal**: Implement automated generation system
 
 Tasks:
+
 - Install and configure openapi-mcp-generator
 - Create script to fetch Windmill OpenAPI spec
 - Implement generation script
@@ -62,9 +70,11 @@ Tasks:
 - Test basic generation workflow
 
 ### Phase 3: Override System
+
 **Goal**: Enable customization preservation
 
 Tasks:
+
 - Design override directory structure
 - Implement override application script
 - Create merge strategy for conflicts
@@ -72,9 +82,11 @@ Tasks:
 - Test override persistence across regenerations
 
 ### Phase 4: Testing Infrastructure
+
 **Goal**: Establish comprehensive testing
 
 Tasks:
+
 - Set up test framework (Jest/Mocha)
 - Create test utilities for Windmill connection
 - Implement endpoint-specific tests
@@ -82,9 +94,11 @@ Tasks:
 - Document testing procedures
 
 ### Phase 5: Polish & Release
+
 **Goal**: Finalize for production use
 
 Tasks:
+
 - Comprehensive documentation review
 - Performance optimization
 - Error handling improvements
@@ -102,11 +116,13 @@ Tasks:
 ## Risk Management
 
 ### Technical Risks
+
 - **OpenAPI spec changes**: Monitor Windmill releases, version lock when needed
 - **Generator compatibility**: Pin generator version, test before updating
 - **Override conflicts**: Implement robust merge strategy with manual review option
 
 ### Process Risks
+
 - **Maintenance burden**: Automate as much as possible, clear documentation
 - **Breaking changes**: Semantic versioning, changelog, migration guides
 - **Test reliability**: Use stable test instance, mock when appropriate
@@ -141,4 +157,4 @@ Tasks:
 
 ## Next Steps
 
-See [SPRINTS.md](./SPRINTS.md) for detailed sprint planning and current work items.
+See [sprints.md](./sprints.md) for detailed sprint planning and current work items.
