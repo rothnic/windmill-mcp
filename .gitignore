@@ -138,17 +138,11 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Generator artifacts
-generator/cache/
-generator/temp/
-generator/logs/
+# Cache files (OpenAPI specs, logs, etc.)
+cache/
 
-# Generated MCP server code (downloaded/generated at runtime, cached in user's home directory)
-src/generated/
-src/generated-temp/
-# Ignore all generated files in src/ except runtime
-src/*
-!src/runtime/
+# Generated MCP server code (built from openapi-mcp-generator)
+build/
 
 # Test artifacts
 tests/fixtures/temp/

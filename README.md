@@ -10,6 +10,7 @@ Provides complete [Windmill](https://windmill.dev) API access through MCP (Model
 ## Overview
 
 This project uses [openapi-mcp-generator](https://github.com/harsha-iiiv/openapi-mcp-generator) to generate an MCP server from Windmill's OpenAPI specification, with support for:
+
 - Automated regeneration from latest OpenAPI specs
 - Custom overrides and modifications that persist across regenerations
 - Testing infrastructure for live Windmill instances
@@ -18,41 +19,33 @@ This project uses [openapi-mcp-generator](https://github.com/harsha-iiiv/openapi
 
 ```
 windmill-mcp/
-├── generator/          # Generator configuration and scripts
-├── overrides/          # Custom modifications that override generated code
-├── src/               # Generated MCP server code
-├── tests/             # Test suite for MCP endpoints
-├── .github/agents/    # Agent configuration and project planning
-└── scripts/           # Utility scripts for generation and testing
+├── src/
+│   ├── generator/      # Generator configuration and scripts
+│   ├── overrides/      # Custom modifications that override generated code
+│   └── runtime/        # Runtime loader for version management
+├── build/              # Generated MCP server code (gitignored)
+├── cache/              # Cached OpenAPI specs (gitignored)
+├── tests/              # Test suite for MCP endpoints
+└── .github/agents/     # Agent configuration and project planning
 ```
 
 ## Setup
 
-### Quick Start (No Installation Required)
+> ⚠️ **Pre-Release Status**: This package is not yet published to npm. To use it, you must clone and build locally (see Development Setup below).
 
-Run the MCP server directly with npx:
+### Using with MCP Clients
 
-```bash
-# Latest Windmill version
-npx windmill-mcp
+Once you've built the project locally, you can use it with MCP clients like Claude Desktop or OpenCode.
 
-# Specific Windmill version
-WINDMILL_VERSION=1.520.1 npx windmill-mcp
-
-# The first run downloads and caches the generated code
-# Subsequent runs are instant!
-```
-
-Or add to your MCP client configuration (e.g., Claude Desktop):
+**For Claude Desktop**, add to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
 
 ```json
 {
   "mcpServers": {
     "windmill": {
-      "command": "npx",
-      "args": ["windmill-mcp"],
+      "command": "node",
+      "args": ["/absolute/path/to/windmill-mcp/src/runtime/index.js"],
       "env": {
-        "WINDMILL_VERSION": "1.520.1",
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-api-token"
       }
@@ -61,41 +54,25 @@ Or add to your MCP client configuration (e.g., Claude Desktop):
 }
 ```
 
-### How It Works
+**For OpenCode**, create or update `.opencode/opencode.jsonc` in your project:
 
-The MCP server uses a **runtime artifact download** approach:
-
-1. **On first run**: Downloads pre-tested generated code from GitHub Releases
-2. **Caches locally**: Stores in `~/.cache/windmill-mcp/{version}/`
-3. **Instant startup**: Subsequent runs load from cache (<1s)
-4. **Fallback generation**: Can generate locally if artifact not available
-
-**Key Benefits:**
-- ✅ **Pre-tested artifacts**: Only tested versions are released
-- ✅ **Fast startup**: Download once, run instantly thereafter
-- ✅ **Version flexibility**: Switch between Windmill versions with an env var
-- ✅ **Single package**: No need to manage multiple npm versions
-
-### Version Targeting
-
-```bash
-# Use latest Windmill version
-npx windmill-mcp
-
-# Use specific Windmill version
-WINDMILL_VERSION=1.520.1 npx windmill-mcp
-
-# List available versions
-npx windmill-mcp --list-available
-
-# List cached versions
-npx windmill-mcp --list-cached
-
-# Clear cache for a version
-npx windmill-mcp --clear-cache 1.520.1
-
-# Clear all cache
-npx windmill-mcp --clear-cache
+```jsonc
+{
+  "mcp": {
+    "windmill": {
+      "type": "local",
+      "command": [
+        "node",
+        "/absolute/path/to/windmill-mcp/src/runtime/index.js",
+      ],
+      "environment": {
+        "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
+        "WINDMILL_API_TOKEN": "your-api-token",
+      },
+      "enabled": true,
+    },
+  },
+}
 ```
 
 ### Development Setup
@@ -118,18 +95,20 @@ cd windmill-mcp
 # Install dependencies
 npm install
 
-# Start local Windmill instance and set up everything
+# Option 1: Complete setup with local Windmill instance
 npm run dev:setup
 
-# This will:
-# 1. Start Windmill in Docker
-# 2. Wait for it to be ready
-# 3. Fetch OpenAPI spec from running instance
-# 4. Generate MCP server code
-# 5. Build the generated code
+# Option 2: Generate without Docker (use your own Windmill instance)
+npm run dev:mcp:ready
 
-# In another terminal, run the MCP server
-npm run dev:mcp
+# This will:
+# 1. Fetch OpenAPI spec from Windmill
+# 2. Generate MCP server code in build/
+# 3. Apply any overrides from src/overrides/
+
+# The generated code is in build/ and ready to use
+# Run the runtime loader which handles everything:
+node src/runtime/index.js
 ```
 
 #### Development Workflow
@@ -158,14 +137,16 @@ npm run docker:clean
 **Running the MCP Server:**
 
 ```bash
-# Option 1: Run generated MCP server against local Windmill
-npm run dev:mcp
+# Run the runtime loader (recommended - handles version management)
+node src/runtime/index.js
 
-# Option 2: Run against your own Windmill instance
-cd src
+# Or run with specific Windmill version
+WINDMILL_VERSION=1.520.1 node src/runtime/index.js
+
+# With your own Windmill instance
 WINDMILL_BASE_URL=https://your-instance.windmill.dev \
 WINDMILL_API_TOKEN=your-token \
-node build/index.js
+node src/runtime/index.js
 ```
 
 **Testing:**
@@ -183,6 +164,33 @@ npm run test:e2e
 # Run complete E2E cycle (starts/stops Windmill automatically)
 npm run test:e2e:full
 ```
+
+#### Testing the MCP Server
+
+Test the MCP server using the MCP Inspector:
+
+```bash
+# With local Windmill instance (matches OpenCode config)
+WINDMILL_BASE_URL=http://localhost:8000 \
+WINDMILL_API_TOKEN=test-super-secret \
+npx @modelcontextprotocol/inspector node src/build/index.js
+
+# Using absolute path (for use outside project directory)
+WINDMILL_BASE_URL=http://localhost:8000 \
+WINDMILL_API_TOKEN=test-super-secret \
+npx @modelcontextprotocol/inspector node /Users/nroth/workspace/windmill-mcp/src/build/index.js
+
+# With your own Windmill instance
+WINDMILL_BASE_URL=https://your-instance.windmill.dev \
+WINDMILL_API_TOKEN=your-api-token \
+npx @modelcontextprotocol/inspector node src/build/index.js
+```
+
+This will open a web interface where you can:
+
+- See all available tools
+- Test tool invocations
+- Debug any issues
 
 See [TESTING.md](TESTING.md) for comprehensive testing documentation.
 
@@ -210,6 +218,7 @@ New Windmill versions are automatically published via GitHub Actions:
 - **Results**: Creates GitHub Release with tested artifacts
 
 **The workflow:**
+
 1. Starts Windmill in Docker
 2. Fetches OpenAPI specification
 3. Generates MCP server code
@@ -218,6 +227,7 @@ New Windmill versions are automatically published via GitHub Actions:
 6. Users automatically get the tested version on first run
 
 **Release Tags:**
+
 - `windmill-latest` - Always the newest Windmill version
 - `windmill-v1.520.1-mcp-0.2.0` - Specific Windmill + package version
 
@@ -241,6 +251,7 @@ npm run generate
 ```
 
 This will:
+
 1. Fetch the latest OpenAPI specification from Windmill
 2. Run openapi-mcp-generator to create the MCP server
 3. Apply any custom overrides from the `overrides/` directory
@@ -287,6 +298,7 @@ npm run dev
 ### Modifying Generation Behavior
 
 Edit the generator configuration in `generator/config.json` to customize:
+
 - OpenAPI spec source URL
 - Generation templates
 - Output directory structure
@@ -297,12 +309,14 @@ Edit the generator configuration in `generator/config.json` to customize:
 ### Setup Test Environment
 
 1. Configure test instance in `.env`:
+
 ```bash
 WINDMILL_BASE_URL=https://your-windmill-instance.com
 WINDMILL_API_TOKEN=your-api-token
 ```
 
 2. Run test suite:
+
 ```bash
 npm run test:live
 ```
@@ -310,6 +324,7 @@ npm run test:live
 ### Test Coverage
 
 Tests are organized by endpoint category:
+
 - `tests/workflows/` - Workflow operations
 - `tests/scripts/` - Script operations
 - `tests/resources/` - Resource management
@@ -318,6 +333,7 @@ Tests are organized by endpoint category:
 ## Project Planning
 
 Project planning, sprints, and agent configurations are maintained in `.github/agents/`. See:
+
 - `.github/agents/PROJECT_PLAN.md` - Overall project roadmap
 - `.github/agents/SPRINTS.md` - Sprint planning and tracking
 - `.github/agents/AGENTS.md` - Agent configurations and responsibilities
@@ -332,6 +348,7 @@ Project planning, sprints, and agent configurations are maintained in `.github/a
 ### CI/CD Checks
 
 All pull requests run automated CI checks:
+
 - ✅ **Unit Tests** (required) - Must pass to merge
 - ✅ **Build Verification** (required) - Generated server must build
 - ℹ️ **E2E Tests** (informational) - Tests with Windmill in Docker
@@ -345,22 +362,26 @@ PRs cannot be merged until required checks pass.
 For maintainers, to publish a new version:
 
 1. Update version in `package.json`:
+
 ```bash
 npm version patch  # or minor, or major
 ```
 
 2. Build and test:
+
 ```bash
 npm run generate
 npm test
 ```
 
 3. Publish to npm:
+
 ```bash
 npm publish
 ```
 
 4. Users can then run with:
+
 ```bash
 npx windmill-mcp
 ```
@@ -370,11 +391,13 @@ npx windmill-mcp
 Alternatively, publish to GitHub Packages for use with `npx rothnic/windmill-mcp`:
 
 1. Authenticate with GitHub:
+
 ```bash
 npm login --registry=https://npm.pkg.github.com
 ```
 
 2. Update package.json with GitHub registry:
+
 ```json
 {
   "name": "@rothnic/windmill-mcp",
@@ -385,6 +408,7 @@ npm login --registry=https://npm.pkg.github.com
 ```
 
 3. Publish:
+
 ```bash
 npm publish
 ```

@@ -1,0 +1,7 @@
+{
+  "index.ts": {
+    "content": "export const API_BASE_URL = process.env.WINDMILL_BASE_URL ?\n  `${process.env.WINDMILL_BASE_URL.replace(/\\/api\\/?$/, '').replace(/\\/+$/, '')}/api` : \"/api\";",
+    "oldString": "export const API_BASE_URL = \"/api\";",
+    "action": "replace"
+  }
+}

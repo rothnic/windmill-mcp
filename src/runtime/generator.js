@@ -24,8 +24,7 @@ export async function generateLocally(windmillVersion) {
   console.log(`🔧 Generating MCP server locally for Windmill ${windmillVersion}...`);
 
   const projectRoot = path.resolve(__dirname, '..', '..');
-  const generatorDir = path.join(projectRoot, 'generator');
-  const tempOutputDir = path.join(projectRoot, 'src', 'generated-temp');
+  const generatorDir = path.join(projectRoot, 'src', 'generator');
 
   try {
     // Fetch OpenAPI spec
@@ -43,8 +42,8 @@ export async function generateLocally(windmillVersion) {
       },
     });
 
-    // The generated code should be in src/ directory
-    const generatedDir = path.join(projectRoot, 'src');
+    // The generated code should be in build/ directory
+    const generatedDir = path.join(projectRoot, 'build');
 
     // Save to cache
     await saveToCache(generatedDir, windmillVersion);
@@ -94,7 +93,7 @@ async function fetchOpenAPISpec(windmillVersion, generatorDir) {
  */
 export async function isGeneratorAvailable() {
   const projectRoot = path.resolve(__dirname, '..', '..');
-  const generatorPath = path.join(projectRoot, 'generator', 'generate.js');
+  const generatorPath = path.join(projectRoot, 'src', 'generator', 'generate.js');
 
   try {
     await fs.access(generatorPath);

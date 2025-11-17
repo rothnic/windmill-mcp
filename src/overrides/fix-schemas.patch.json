@@ -1,0 +1,6 @@
+{
+  "index.ts": {
+    "content": "// Fix for inputSchema validation issues\n// Some tools have invalid schemas that need to be corrected\nconst fixToolSchema = (tool: any) => {\n  if (tool.inputSchema && typeof tool.inputSchema.type !== 'string') {\n    // Fix invalid type - should be 'object' for MCP tools\n    tool.inputSchema = {\n      type: 'object',\n      properties: {}\n    };\n  }\n  return tool;\n};\n\n// Apply fixes to toolDefinitionMap\nfor (const [name, tool] of toolDefinitionMap.entries()) {\n  toolDefinitionMap.set(name, fixToolSchema(tool));\n}\n",
+    "action": "append"
+  }
+}

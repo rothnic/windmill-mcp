@@ -2,15 +2,35 @@
 
 This guide will help you get started with the Windmill MCP Server.
 
+> ⚠️ **Pre-Release Status**: This package is not yet published to npm. Follow the development setup instructions below to use it.
+
 ## For End Users
 
-### Using with npx (Recommended)
+### Prerequisites
 
-The easiest way to use the Windmill MCP server is with npx:
+- Node.js 18+ and npm
+- Git
+- A Windmill instance (local or hosted)
+
+### Setup Steps
+
+1. **Clone and generate the MCP server**:
 
 ```bash
-npx rothnic/windmill-mcp
+git clone https://github.com/rothnic/windmill-mcp.git
+cd windmill-mcp
+npm install
+
+# Generate the MCP server from Windmill's OpenAPI spec
+npm run fetch-spec  # Fetch OpenAPI spec
+npm run generate    # Generate MCP server code
 ```
+
+2. **Get your Windmill credentials**:
+   - Go to your Windmill instance
+   - Navigate to user settings
+   - Generate a new API token
+   - Note your instance URL (e.g., `https://your-instance.windmill.dev`)
 
 ### Using with Claude Desktop
 
@@ -23,8 +43,8 @@ Add to your Claude Desktop configuration file:
 {
   "mcpServers": {
     "windmill": {
-      "command": "npx",
-      "args": ["rothnic/windmill-mcp"],
+      "command": "node",
+      "args": ["/absolute/path/to/windmill-mcp/src/runtime/index.js"],
       "env": {
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-api-token"
@@ -34,18 +54,30 @@ Add to your Claude Desktop configuration file:
 }
 ```
 
-### Configuration
+Replace `/absolute/path/to/windmill-mcp` with the actual path to your cloned repository.
 
-The server requires two environment variables:
+### Using with OpenCode
 
-- `WINDMILL_BASE_URL`: Your Windmill instance URL
-- `WINDMILL_API_TOKEN`: Your Windmill API token
+Add to your project's `.opencode/opencode.jsonc`:
 
-You can get your API token from your Windmill instance:
-1. Go to your Windmill instance
-2. Navigate to your user settings
-3. Generate a new API token
-4. Copy the token
+```jsonc
+{
+  "mcp": {
+    "windmill": {
+      "type": "local",
+      "command": [
+        "node",
+        "/absolute/path/to/windmill-mcp/src/runtime/index.js",
+      ],
+      "environment": {
+        "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
+        "WINDMILL_API_TOKEN": "your-api-token",
+      },
+      "enabled": true,
+    },
+  },
+}
+```
 
 ## For Developers
 
@@ -54,32 +86,93 @@ You can get your API token from your Windmill instance:
 - Node.js 18+
 - npm or yarn
 - Git
+- Docker and Docker Compose (optional, for local Windmill testing)
 
 ### Development Setup
 
 1. **Clone the repository**:
+
 ```bash
 git clone https://github.com/rothnic/windmill-mcp.git
 cd windmill-mcp
 ```
 
 2. **Install dependencies**:
+
+```bash
+npm install
+```
+
+3. **Choose your setup path**:
+
+#### Option A: With Local Windmill (Full Stack)
+
+```bash
+# Starts Docker, generates, builds everything
+npm run dev:setup
+
+# In another terminal, run the MCP server
+npm run dev:mcp
+```
+
+#### Option B: Without Docker (Use Your Own Windmill)
+
+```bash
+# Generate and build the MCP server
+npm run dev:mcp:ready
+
+# Run it against your instance
+cd src
+WINDMILL_BASE_URL=https://your-instance.windmill.dev \
+WINDMILL_API_TOKEN=your-token \
+node build/index.js
+```
+
+### Available Commands
+
+From the root directory:
+
+```bash
+# Complete setup with Docker
+npm run dev:setup
+
+# Generate without Docker
+npm run dev:mcp:ready
+
+# Run MCP server (rebuilds automatically)
+npm run dev:mcp
+
+# Run tests
+npm test
+npm run test:e2e
+
+# Docker management
+npm run docker:dev    # Start Windmill
+npm run docker:down   # Stop Windmill
+npm run docker:clean  # Remove all data
+```
+
+2. **Install dependencies**:
+
 ```bash
 npm install
 ```
 
 3. **Set up environment**:
+
 ```bash
 cp .env.example .env
 # Edit .env with your configuration
 ```
 
 4. **Fetch OpenAPI spec and generate server**:
+
 ```bash
 npm run generate
 ```
 
 5. **Test the server**:
+
 ```bash
 npm run dev
 ```
@@ -102,6 +195,7 @@ npm test            # Verify everything works
 2. Create the same file in `overrides/`
 3. Make your changes
 4. Regenerate to apply:
+
 ```bash
 npm run generate
 ```
@@ -170,6 +264,7 @@ npm publish
 **Problem**: `Error: Cannot find module '@modelcontextprotocol/sdk'`
 
 **Solution**: Install dependencies:
+
 ```bash
 npm install
 ```
@@ -179,6 +274,7 @@ npm install
 **Problem**: `OpenAPI specification not found`
 
 **Solution**: Fetch the spec first:
+
 ```bash
 npm run fetch-spec
 ```
@@ -187,7 +283,8 @@ npm run fetch-spec
 
 **Problem**: Changes in `overrides/` not appearing in `src/`
 
-**Solution**: 
+**Solution**:
+
 1. Check file path matches exactly
 2. Validate syntax: `npm run validate-overrides`
 3. Regenerate: `npm run generate`

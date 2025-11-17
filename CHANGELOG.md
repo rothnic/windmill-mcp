@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
 - Project structure and foundation
 - Generator system for OpenAPI-based MCP server creation
 - Override system for persistent customizations
@@ -17,23 +18,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Project planning and sprint tracking in `.github/agents/`
 
 ### Changed
-- N/A
+
+- Reorganized project structure: moved source files into `src/` directory
+  - `generator/` → `src/generator/` - Generation scripts
+  - `overrides/` → `src/overrides/` - Override patches and validation
+  - `scripts/` → `src/runtime/` - Runtime loader with version management
+  - Generated code now goes to `build/` (gitignored) instead of `src/`
+  - Updated all documentation to reflect new paths
 
 ### Deprecated
+
 - N/A
 
 ### Removed
+
 - N/A
 
 ### Fixed
+
 - N/A
 
 ### Security
+
 - N/A
 
 ## [0.1.0] - 2025-11-11
 
 ### Added
+
 - Initial project setup
 - Basic MCP server structure
 - Generator configuration
@@ -49,21 +61,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [X.Y.Z] - YYYY-MM-DD
 
 ### Added
+
 - New features
 
 ### Changed
+
 - Changes in existing functionality
 
 ### Deprecated
+
 - Soon-to-be removed features
 
 ### Removed
+
 - Removed features
 
 ### Fixed
+
 - Bug fixes
 
 ### Security
+
 - Security fixes
 
 ---

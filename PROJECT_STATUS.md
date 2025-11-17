@@ -6,6 +6,7 @@
 ## Overview
 
 The Windmill MCP Server generator project foundation is complete with:
+
 - ✅ Complete project structure
 - ✅ Generator system (fetch & generate from OpenAPI)
 - ✅ Override system (persistent customizations)
@@ -18,16 +19,16 @@ The Windmill MCP Server generator project foundation is complete with:
 
 ## Quick Stats
 
-| Metric | Count |
-|--------|-------|
-| Total Files | 26 |
-| Documentation Files | 10 |
-| Scripts | 7 |
-| Test Files | 4 |
-| Config Files | 5 |
-| Unit Tests | 13 passing ✅ |
-| Lines of Documentation | ~2000+ |
-| Dependencies | 3 runtime, 5 dev |
+| Metric                 | Count            |
+| ---------------------- | ---------------- |
+| Total Files            | 26               |
+| Documentation Files    | 10               |
+| Scripts                | 7                |
+| Test Files             | 4                |
+| Config Files           | 5                |
+| Unit Tests             | 13 passing ✅    |
+| Lines of Documentation | ~2000+           |
+| Dependencies           | 3 runtime, 5 dev |
 
 ## Project Structure
 
@@ -40,22 +41,28 @@ windmill-mcp/
 │   │   └── SPRINTS.md      # Sprint tracking
 │   └── workflows/          # GitHub Actions workflows
 │       └── update-mcp-server.yml # Automated update workflow
-├── generator/              # OpenAPI spec fetching & generation
-│   ├── config.json         # Generator configuration
-│   ├── fetch-spec.js       # Fetch OpenAPI specs
-│   └── generate.js         # Generate MCP server
-├── overrides/              # Custom code overrides
-│   └── README.md           # Override documentation
-├── scripts/                # Utility scripts
-│   ├── apply-overrides.js  # Apply custom overrides
-│   └── validate-overrides.js # Validate override syntax
+├── src/
+│   ├── generator/          # OpenAPI spec fetching & generation
+│   │   ├── config.json     # Generator configuration
+│   │   ├── fetch-spec.js   # Fetch OpenAPI specs
+│   │   └── generate.js     # Generate MCP server
+│   ├── overrides/          # Custom code overrides
+│   │   ├── README.md       # Override documentation
+│   │   ├── apply-overrides.js  # Apply custom overrides
+│   │   └── validate-overrides.js # Validate override syntax
+│   └── runtime/            # Runtime loader for version management
+│       ├── index.js        # Main entry point
+│       ├── cache.js        # Cache management
+│       ├── downloader.js   # Artifact downloader
+│       └── generator.js    # Local generation fallback
+├── build/                  # Generated MCP server code (gitignored)
+├── cache/                  # Cached OpenAPI specs (gitignored)
 ├── tests/                  # Test suite
 │   ├── docker/            # Docker E2E setup
 │   │   ├── docker-compose.yml
 │   │   ├── wait-for-windmill.js
 │   │   └── README.md
 │   ├── e2e/               # End-to-end tests
-│   ├── integration/       # Integration tests
 │   ├── unit/              # Unit tests (✅ 13 passing)
 │   ├── utils/             # Test utilities & mocks
 │   ├── setup.js           # Test setup
@@ -78,12 +85,14 @@ windmill-mcp/
 ## Features Implemented
 
 ### ✅ Generator System
+
 - [x] Fetch OpenAPI specs from Windmill (with fallback URLs)
 - [x] Generate MCP server structure
 - [x] Post-generation hooks
 - [x] Placeholder implementation (ready for openapi-mcp-generator)
 
 ### ✅ Override System
+
 - [x] Directory structure mirroring src/
 - [x] Automatic override application
 - [x] Syntax validation
@@ -92,6 +101,7 @@ windmill-mcp/
 - [x] Comprehensive documentation
 
 ### ✅ Testing Infrastructure
+
 - [x] Vitest configuration
 - [x] Unit tests with mocks (no external deps)
 - [x] Integration test structure
@@ -102,6 +112,7 @@ windmill-mcp/
 - [x] Watch mode and UI mode
 
 ### ✅ Docker E2E Setup
+
 - [x] Minimal Windmill Docker Compose
 - [x] PostgreSQL database
 - [x] Health checks
@@ -110,6 +121,7 @@ windmill-mcp/
 - [x] Complete documentation
 
 ### ✅ npm Package Configuration
+
 - [x] Bin entry for npx execution
 - [x] .npmignore for clean distribution
 - [x] Proper package.json metadata
@@ -117,6 +129,7 @@ windmill-mcp/
 - [x] Publishing documentation
 
 ### ✅ Documentation
+
 - [x] Comprehensive README
 - [x] Quick start guide
 - [x] Testing guide (unit/integration/e2e)
@@ -129,6 +142,7 @@ windmill-mcp/
 - [x] Changelog template
 
 ### ✅ Automation & CI/CD
+
 - [x] GitHub Actions workflow for automated updates
 - [x] Manual workflow trigger support
 - [x] Scheduled weekly updates
@@ -140,6 +154,7 @@ windmill-mcp/
 ## Test Results
 
 ### Unit Tests ✅
+
 ```bash
 $ npm run test:unit
 
@@ -155,6 +170,7 @@ Duration    ~300ms
 ```
 
 ### E2E Tests ✅
+
 ```bash
 $ npm run test:e2e
 
@@ -169,16 +185,44 @@ Tests       2 passed | 5 skipped (7)
 
 ### For End Users
 
+> ⚠️ **Note**: Package not yet published to npm. See Development Setup below.
+
+Once published, users will be able to run:
+
 ```bash
 # Run directly with npx (no installation needed)
-npx rothnic/windmill-mcp
+npx windmill-mcp
 
 # Or add to Claude Desktop config
 {
   "mcpServers": {
     "windmill": {
       "command": "npx",
-      "args": ["rothnic/windmill-mcp"],
+      "args": ["windmill-mcp"],
+      "env": {
+        "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
+        "WINDMILL_API_TOKEN": "your-token"
+      }
+    }
+  }
+}
+```
+
+### Current Usage (Pre-Release)
+
+```bash
+# Clone and build
+git clone https://github.com/rothnic/windmill-mcp.git
+cd windmill-mcp
+npm install
+npm run dev:mcp:ready
+
+# Then configure your MCP client with:
+{
+  "mcpServers": {
+    "windmill": {
+      "command": "node",
+      "args": ["/absolute/path/to/windmill-mcp/src/build/index.js"],
       "env": {
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-token"
@@ -222,10 +266,12 @@ The project includes an automated workflow for keeping the MCP server up to date
 **Workflow:** `.github/workflows/update-mcp-server.yml`
 
 **Triggers:**
+
 - **Manual**: Actions → "Update MCP Server" → "Run workflow"
 - **Scheduled**: Weekly on Mondays at midnight UTC
 
 **Process:**
+
 1. Fetches latest OpenAPI specification from Windmill
 2. Generates MCP server code with overrides
 3. Runs complete test suite
@@ -235,46 +281,51 @@ The project includes an automated workflow for keeping the MCP server up to date
    - ⚠️ **Draft** if tests fail (with failure details)
 
 **Benefits:**
+
 - Keeps server in sync with Windmill API changes
 - Automatic testing ensures quality
 - No manual intervention needed for routine updates
 - Clear visibility of test results in PR
 
-
 ## Technology Stack
 
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Test Framework | Vitest | ^1.2.0 |
-| Runtime | Node.js | >=18.0.0 |
-| MCP SDK | @modelcontextprotocol/sdk | ^0.5.0 |
-| Container Platform | Docker Compose | v3.8 |
-| Database (E2E) | PostgreSQL | 14 |
-| Mock Server | MSW | ^2.0.0 |
+| Component          | Technology                | Version  |
+| ------------------ | ------------------------- | -------- |
+| Test Framework     | Vitest                    | ^1.2.0   |
+| Runtime            | Node.js                   | >=18.0.0 |
+| MCP SDK            | @modelcontextprotocol/sdk | ^0.5.0   |
+| Container Platform | Docker Compose            | v3.8     |
+| Database (E2E)     | PostgreSQL                | 14       |
+| Mock Server        | MSW                       | ^2.0.0   |
 
 ## Key Decisions
 
 ### Testing Strategy
+
 - **Decision**: Three-tier testing (unit/integration/e2e)
 - **Rationale**: Balance speed, reliability, and coverage
 - **Impact**: Fast feedback (unit), comprehensive coverage (e2e)
 
 ### Vitest vs Jest
+
 - **Decision**: Use Vitest instead of Jest
 - **Rationale**: Better ESM support, faster, modern API
 - **Impact**: Improved DX, faster test execution
 
 ### Docker Setup
+
 - **Decision**: Minimal single-container Windmill
 - **Rationale**: Easy onboarding, no complex dependencies
 - **Impact**: Simple setup, sufficient for testing
 
 ### Override System
+
 - **Decision**: Separate overrides/ directory
 - **Rationale**: Clear separation of generated vs custom code
 - **Impact**: Easy to maintain, survives regeneration
 
 ### npx Execution
+
 - **Decision**: Support npx without cloning
 - **Rationale**: Standard MCP server pattern, better UX
 - **Impact**: Easier adoption, simpler for end users
@@ -282,6 +333,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 ## Next Steps (Phase 2)
 
 ### Immediate
+
 - [x] Set up GitHub Actions CI/CD for automated updates
 - [ ] Install openapi-mcp-generator as dependency
 - [ ] Integrate actual MCP server generation
@@ -289,6 +341,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 - [ ] Add more unit tests for generated code
 
 ### Short Term
+
 - [ ] Publish v0.1.0 to npm
 - [ ] Create example MCP client integration
 - [ ] Add integration tests
@@ -296,6 +349,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 - [ ] Add more override examples
 
 ### Medium Term
+
 - [ ] Full E2E test coverage
 - [ ] Performance optimization
 - [ ] Error handling improvements
@@ -305,6 +359,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 ## Dependencies
 
 ### Runtime
+
 ```json
 {
   "@modelcontextprotocol/sdk": "^0.5.0",
@@ -313,6 +368,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 ```
 
 ### Development
+
 ```json
 {
   "@types/node": "^20.11.0",
@@ -327,14 +383,14 @@ The project includes an automated workflow for keeping the MCP server up to date
 
 ## Success Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Unit test coverage | >80% | N/A* | ⏳ Pending generation |
-| Unit test pass rate | 100% | 100% | ✅ |
-| E2E test pass rate | >95% | N/A* | ⏳ Pending implementation |
-| Generation time | <5min | ~1min | ✅ |
-| Override success | 100% | 100% | ✅ |
-| Documentation complete | 100% | 100% | ✅ |
+| Metric                 | Target | Current | Status                    |
+| ---------------------- | ------ | ------- | ------------------------- |
+| Unit test coverage     | >80%   | N/A\*   | ⏳ Pending generation     |
+| Unit test pass rate    | 100%   | 100%    | ✅                        |
+| E2E test pass rate     | >95%   | N/A\*   | ⏳ Pending implementation |
+| Generation time        | <5min  | ~1min   | ✅                        |
+| Override success       | 100%   | 100%    | ✅                        |
+| Documentation complete | 100%   | 100%    | ✅                        |
 
 \* Will be applicable after actual MCP server generation in Phase 2
 
@@ -362,6 +418,7 @@ The project includes an automated workflow for keeping the MCP server up to date
 ✅ **Foundation is complete and solid**
 
 The project has a robust foundation with:
+
 - Complete project structure
 - Working generator system
 - Comprehensive testing infrastructure

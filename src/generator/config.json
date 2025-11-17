@@ -3,20 +3,20 @@
   "openapi": {
     "specUrl": "https://app.windmill.dev/api/openapi.json",
     "backupUrl": "https://raw.githubusercontent.com/windmill-labs/windmill/main/openapi.json",
-    "localCache": "./generator/cache/openapi-spec.json",
+    "localCache": "./cache/openapi-spec.json",
     "cacheExpiry": 86400
   },
   "generator": {
     "tool": "openapi-mcp-generator",
-    "outputDir": "./src",
-    "tempDir": "./generator/temp",
+    "outputDir": "./build",
+    "tempDir": "./build/temp",
     "preserveFiles": [
-      "src/index.js",
-      "src/config.js"
+      "build/index.js",
+      "build/config.js"
     ]
   },
   "templates": {
-    "customDir": "./generator/templates",
+    "customDir": "./src/generator/templates",
     "useCustom": false
   },
   "postGeneration": {
@@ -26,14 +26,14 @@
     "generateDocs": false
   },
   "overrides": {
-    "sourceDir": "./overrides",
+    "sourceDir": "./src/overrides",
     "strategy": "merge",
     "conflictResolution": "manual",
     "backupOnConflict": true
   },
   "logging": {
     "level": "info",
-    "file": "./generator/logs/generation.log",
+    "file": "./cache/logs/generation.log",
     "console": true
   }
 }
