@@ -32,11 +32,14 @@ git checkout -b feature/your-feature-name
 # 1. Install dependencies
 npm install
 
-# 2. Start local Windmill and generate MCP server
-npm run dev:setup
+# 2. Start local Windmill
+npm run docker:dev
 
-# 3. In another terminal, run the MCP server
-npm run dev:mcp
+# 3. Generate the MCP server
+npm run generate
+
+# 4. In another terminal, run the MCP server
+npm run dev
 ```
 
 ### Detailed Development Workflow
@@ -108,7 +111,7 @@ cache/
 **For Development:**
 
 1. Generate code locally: `npm run generate`
-2. Test against local Windmill: `npm run dev:mcp`
+2. Test against local Windmill: `npm run dev`
 3. Generated files stay local only
 
 **For CI/CD:**
@@ -135,7 +138,8 @@ npm test
 
 # Run specific test suites
 npm run test:unit
-npm run test:integration
+npm run test:e2e
+npm run test:e2e:full
 
 # Validate code
 npm run validate
@@ -313,20 +317,33 @@ npm run validate-overrides
 
 ## Testing with a Live Windmill Instance
 
-For integration testing:
+For E2E testing:
 
-1. Set up a test Windmill instance
-2. Create a `.env` file:
+1. Set up a test Windmill instance (or use local Docker):
 
 ```bash
-cp .env.example .env
-# Edit .env with your instance details
+# Start local Windmill
+npm run docker:dev
 ```
 
-3. Run integration tests:
+2. Set environment variables:
 
 ```bash
-npm run test:live
+export E2E_WINDMILL_URL=http://localhost:8000
+export E2E_WINDMILL_TOKEN=test-super-secret
+export E2E_WORKSPACE=admins
+```
+
+3. Run E2E tests:
+
+```bash
+npm run test:e2e
+```
+
+Or run the complete cycle with automatic Windmill setup:
+
+```bash
+npm run test:e2e:full
 ```
 
 ## Adding New Features
