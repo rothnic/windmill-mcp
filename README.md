@@ -95,19 +95,17 @@ cd windmill-mcp
 # Install dependencies
 npm install
 
-# Option 1: Complete setup with local Windmill instance
-npm run dev:setup
+# Generate the MCP server (fetches spec, generates code, applies overrides, builds)
+npm run generate
 
-# Option 2: Generate without Docker (use your own Windmill instance)
-npm run dev:mcp:ready
-
-# This will:
+# This single command performs:
 # 1. Fetch OpenAPI spec from Windmill
 # 2. Generate MCP server code in build/
 # 3. Apply any overrides from src/overrides/
+# 4. Build the TypeScript code to JavaScript
 
-# The generated code is in build/ and ready to use
-# Run the runtime loader which handles everything:
+# The generated and compiled code is in build/ and ready to use
+# Run the runtime loader which handles version management:
 node src/runtime/index.js
 ```
 
@@ -173,17 +171,17 @@ Test the MCP server using the MCP Inspector:
 # With local Windmill instance (matches OpenCode config)
 WINDMILL_BASE_URL=http://localhost:8000 \
 WINDMILL_API_TOKEN=test-super-secret \
-npx @modelcontextprotocol/inspector node src/build/index.js
+npx @modelcontextprotocol/inspector node build/build/index.js
 
 # Using absolute path (for use outside project directory)
 WINDMILL_BASE_URL=http://localhost:8000 \
 WINDMILL_API_TOKEN=test-super-secret \
-npx @modelcontextprotocol/inspector node /Users/nroth/workspace/windmill-mcp/src/build/index.js
+npx @modelcontextprotocol/inspector node /Users/nroth/workspace/windmill-mcp/build/build/index.js
 
 # With your own Windmill instance
 WINDMILL_BASE_URL=https://your-instance.windmill.dev \
 WINDMILL_API_TOKEN=your-api-token \
-npx @modelcontextprotocol/inspector node src/build/index.js
+npx @modelcontextprotocol/inspector node build/build/index.js
 ```
 
 This will open a web interface where you can:
@@ -197,14 +195,16 @@ See [TESTING.md](docs/testing.md) for comprehensive testing documentation.
 #### Regenerating the MCP Server
 
 ```bash
-# Fetch latest OpenAPI spec and regenerate
+# Fetch latest OpenAPI spec, regenerate, and build
 npm run generate
 
-# The generated code goes to src/
-# Build it to test locally
-cd src
-npm install
-npm run build
+# This single command performs the complete workflow:
+# 1. Pre-generation: Fetches the latest OpenAPI specification
+# 2. Generation: Creates TypeScript MCP server in build/src/
+# 3. Post-generation: Applies overrides and builds to build/build/
+
+# The compiled JavaScript is immediately ready to use
+# No manual build step needed!
 ```
 
 ## Usage
@@ -250,11 +250,16 @@ To manually generate or regenerate the MCP server from the latest Windmill OpenA
 npm run generate
 ```
 
-This will:
+This single command performs the complete workflow:
 
-1. Fetch the latest OpenAPI specification from Windmill
-2. Run openapi-mcp-generator to create the MCP server
-3. Apply any custom overrides from the `overrides/` directory
+1. **Pre-generation**: Fetches the latest OpenAPI specification from Windmill
+2. **Generation**: Runs openapi-mcp-generator to create TypeScript MCP server in `build/src/`
+3. **Post-generation**:
+   - Applies custom overrides from the `src/overrides/` directory
+   - Installs dependencies in `build/`
+   - Builds the TypeScript code to JavaScript in `build/build/`
+
+The compiled server is immediately ready to use - no additional build steps needed!
 
 ### Applying Custom Overrides
 
@@ -272,10 +277,19 @@ Run tests against a live Windmill instance:
 npm test
 ```
 
-For integration tests with a specific Windmill instance:
+For E2E tests with a specific Windmill instance:
 
 ```bash
-npm run test:integration
+# Set environment variables
+export E2E_WINDMILL_URL=http://localhost:8000
+export E2E_WINDMILL_TOKEN=test-super-secret
+export E2E_WORKSPACE=admins
+
+# Run E2E tests
+npm run test:e2e
+
+# Or run complete cycle with automatic Windmill setup
+npm run test:e2e:full
 ```
 
 ### Development
@@ -308,17 +322,26 @@ Edit the generator configuration in `generator/config.json` to customize:
 
 ### Setup Test Environment
 
-1. Configure test instance in `.env`:
+1. Start local Windmill or use your own instance:
 
 ```bash
-WINDMILL_BASE_URL=https://your-windmill-instance.com
-WINDMILL_API_TOKEN=your-api-token
+# Option A: Use local Windmill
+npm run docker:dev
+
+# Option B: Use your own instance
+export E2E_WINDMILL_URL=https://your-windmill-instance.com
+export E2E_WINDMILL_TOKEN=your-api-token
+export E2E_WORKSPACE=your-workspace
 ```
 
 2. Run test suite:
 
 ```bash
-npm run test:live
+# Run E2E tests
+npm run test:e2e
+
+# Or run complete cycle with automatic Windmill setup
+npm run test:e2e:full
 ```
 
 ### Test Coverage
