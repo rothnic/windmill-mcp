@@ -214,14 +214,14 @@ npx windmill-mcp
 git clone https://github.com/rothnic/windmill-mcp.git
 cd windmill-mcp
 npm install
-npm run dev:mcp:ready
+npm run generate
 
 # Then configure your MCP client with:
 {
   "mcpServers": {
     "windmill": {
       "command": "node",
-      "args": ["/absolute/path/to/windmill-mcp/src/build/index.js"],
+      "args": ["/absolute/path/to/windmill-mcp/src/runtime/index.js"],
       "env": {
         "WINDMILL_BASE_URL": "https://your-instance.windmill.dev",
         "WINDMILL_API_TOKEN": "your-token"

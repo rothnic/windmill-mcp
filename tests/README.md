@@ -5,18 +5,21 @@ This directory contains the test suite for the Windmill MCP server using **Vites
 ## Test Strategy
 
 ### 1. Unit Tests (`tests/unit/`)
+
 - Test individual functions and components in isolation
 - **No external dependencies** - use mocks for Windmill API
 - Fast execution (milliseconds)
 - Run on every commit
 
 ### 2. Integration Tests (`tests/integration/`)
+
 - Test integration between components
 - May use mocked external services
 - Moderate execution time (seconds)
 - Run before merges
 
 ### 3. E2E Tests (`tests/e2e/`)
+
 - Test against a **real Windmill instance** (Docker)
 - Verify complete workflows end-to-end
 - Slower execution (minutes)
@@ -51,11 +54,11 @@ npm run test:ui
 # Run only unit tests (fast, no external deps)
 npm run test:unit
 
-# Run only integration tests
-npm run test:integration
-
 # Run E2E tests (requires Windmill running)
 npm run test:e2e
+
+# Run complete E2E cycle (starts/stops Windmill automatically)
+npm run test:e2e:full
 
 # Run tests with coverage report
 npm run test:coverage
@@ -82,6 +85,7 @@ npm run docker:down
 ### Complete E2E Cycle
 
 Run everything in one command:
+
 ```bash
 npm run test:e2e:full
 ```
@@ -106,6 +110,7 @@ E2E_WORKSPACE=demo
 ```
 
 To get an API token:
+
 1. Start Windmill: `npm run docker:up`
 2. Access UI: http://localhost:8000
 3. Login/create account
@@ -120,14 +125,14 @@ Use mocks to avoid external dependencies:
 
 ```javascript
 // tests/unit/my-feature.test.js
-import { describe, it, expect } from 'vitest';
-import { MockWindmillClient } from '../utils/mocks.js';
+import { describe, it, expect } from "vitest";
+import { MockWindmillClient } from "../utils/mocks.js";
 
-describe('My Feature', () => {
-  it('should work with mock client', async () => {
+describe("My Feature", () => {
+  it("should work with mock client", async () => {
     const client = new MockWindmillClient();
-    const jobs = await client.listJobs('test-workspace');
-    
+    const jobs = await client.listJobs("test-workspace");
+
     expect(jobs).toBeInstanceOf(Array);
   });
 });
@@ -139,15 +144,14 @@ Test against real Windmill:
 
 ```javascript
 // tests/e2e/my-feature.test.js
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 
-const isE2EEnabled = process.env.E2E_WINDMILL_URL && process.env.E2E_WINDMILL_TOKEN;
+const isE2EEnabled =
+  process.env.E2E_WINDMILL_URL && process.env.E2E_WINDMILL_TOKEN;
 
-describe.skipIf(!isE2EEnabled)('My E2E Test', () => {
-  it('should work with real Windmill', async () => {
-    const response = await fetch(
-      `${process.env.E2E_WINDMILL_URL}/api/version`
-    );
+describe.skipIf(!isE2EEnabled)("My E2E Test", () => {
+  it("should work with real Windmill", async () => {
+    const response = await fetch(`${process.env.E2E_WINDMILL_URL}/api/version`);
     expect(response.ok).toBe(true);
   });
 });
@@ -188,6 +192,7 @@ fixtures/
 ## CI/CD
 
 Tests run automatically on:
+
 - Pull requests
 - Commits to main branch
 - Before releases
