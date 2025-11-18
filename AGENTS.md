@@ -17,21 +17,56 @@ This project uses AI agents to assist with development, maintenance, and testing
 - Fetch latest Windmill OpenAPI specifications
 - Execute openapi-mcp-generator with proper configuration
 - Handle generation errors and edge cases
-- Apply post-generation processing
-- Validate generated output
+- Apply post-generation processing (overrides)
+- Build the generated MCP server automatically
+- Validate generated and built output
 
 **Key Files**:
 
 - `generator/config.json`
 - `generator/fetch-spec.js`
 - `generator/generate.js`
+- `overrides/apply-overrides.js`
 
 **Commands**:
 
 ```bash
-npm run fetch-spec
+# Full generation workflow (fetch → generate → override → build)
 npm run generate
+
+# Individual steps (if needed):
+npm run fetch-spec          # Fetch OpenAPI spec only
+npm run build:generated     # Build generated code only
 ```
+
+**Build Process**:
+
+The `npm run generate` command executes a complete workflow:
+
+1. **Pre-generation** (`pregenerate` hook): Fetches OpenAPI spec from Windmill
+2. **Generation**: Runs openapi-mcp-generator to create TypeScript code in `build/`
+3. **Post-generation** (`postgenerate` hook):
+   - Applies custom overrides from `overrides/`
+   - Installs dependencies in `build/`
+   - Compiles TypeScript to `build/build/index.js`
+
+**Output Structure**:
+
+```
+build/
+├── src/
+│   └── index.ts           # Generated MCP server code
+├── build/
+│   └── index.js           # Compiled JavaScript
+├── package.json
+└── node_modules/
+```
+
+**Troubleshooting**:
+
+- If build fails, check `build/build/index.js` exists after generation
+- Generated code location changed from `src/` to `build/` in recent updates
+- The complete workflow is now atomic - no need to manually build after generation
 
 ---
 
@@ -83,9 +118,11 @@ npm run validate-overrides
 **Commands**:
 
 ```bash
-npm test
-npm run test:integration
-npm run test:live
+npm test                    # Run all tests
+npm run test:unit          # Run unit tests only
+npm run test:e2e           # Run E2E tests (requires Docker)
+npm run test:e2e:full      # Full E2E suite with setup
+npm run test:coverage      # Generate coverage report
 ```
 
 ---
@@ -141,12 +178,15 @@ npm run validate
 graph TD
     A[Trigger Generation] --> B[Generator Agent: Fetch OpenAPI Spec]
     B --> C[Generator Agent: Run openapi-mcp-generator]
-    C --> D[Generator Agent: Validate Output]
-    D --> E[Override Agent: Apply Custom Overrides]
-    E --> F[QA Agent: Lint & Validate]
-    F --> G[Testing Agent: Run Tests]
-    G --> H[Documentation Agent: Update Docs if Needed]
+    C --> D[Generator Agent: Apply Custom Overrides]
+    D --> E[Generator Agent: Build MCP Server]
+    E --> F[Generator Agent: Validate Output]
+    F --> G[QA Agent: Lint & Validate]
+    G --> H[Testing Agent: Run Tests]
+    H --> I[Documentation Agent: Update Docs if Needed]
 ```
+
+**Note**: Steps B through F are now all executed by the single `npm run generate` command, making the workflow atomic and eliminating manual build steps.
 
 ### Testing Workflow
 
@@ -344,28 +384,43 @@ Store in respective config files:
 ### All Agent Commands
 
 ```bash
-# Generation
-npm run fetch-spec          # Fetch latest OpenAPI spec
-npm run generate            # Generate MCP server
+# MCP Server Generation
+npm run generate            # Complete generation workflow (fetch → generate → override → build)
+npm run fetch-spec          # Fetch latest OpenAPI spec only
+npm run build:generated     # Build generated code only
 
-# Overrides
+# Custom Overrides
 npm run apply-overrides     # Apply custom overrides
 npm run validate-overrides  # Check override validity
 
+# Development
+npm run dev                 # Run the MCP server directly
+
 # Testing
 npm test                    # Run all tests
-npm run test:unit          # Run unit tests
-npm run test:integration   # Run integration tests
-npm run test:live          # Run against live instance
+npm run test:watch         # Run tests in watch mode
+npm run test:ui            # Run tests with UI
+npm run test:unit          # Run unit tests only
+npm run test:e2e           # Run E2E tests (requires Docker)
+npm run test:e2e:full      # Full E2E suite with setup
+npm run test:coverage      # Generate coverage report
 
-# Quality
-npm run lint               # Run linter
-npm run format             # Format code
+# Code Quality
+npm run lint               # Run linter (ls-lint)
+npm run lint:structure     # Check file structure
+npm run format             # Format code (Prettier)
 npm run validate           # Validate all configs
 
 # Documentation
 npm run docs:build         # Build documentation
 npm run docs:validate      # Check for broken links
+
+# Docker (Development & Testing)
+npm run docker:dev         # Start Windmill dev environment
+npm run docker:stop        # Stop Docker services
+npm run docker:clean       # Clean Docker volumes
+npm run docker:logs        # View Docker logs
+npm run docker:wait        # Wait for services to be ready
 ```
 
 ---
