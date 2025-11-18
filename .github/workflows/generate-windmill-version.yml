@@ -6,10 +6,10 @@ on:
       windmill_version:
         description: 'Windmill version (e.g., 1.520.1 or "latest")'
         required: true
-        default: 'latest'
+        default: "latest"
         type: string
   schedule:
-    - cron: '0 0 * * 1'  # Run weekly on Mondays at midnight UTC (generates latest)
+    - cron: "0 0 * * 1" # Run weekly on Mondays at midnight UTC (generates latest)
 
 permissions:
   contents: write
@@ -25,8 +25,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: "18"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -58,12 +58,25 @@ jobs:
           echo "spec_version=$SPEC_VERSION" >> $GITHUB_OUTPUT
           echo "✅ Fetched OpenAPI spec version: $SPEC_VERSION"
 
-      - name: Generate MCP server
+      - name: Generate and build MCP server
         id: generate
         run: |
-          echo "🔧 Generating MCP server from OpenAPI spec..."
+          echo "🔧 Generating and building MCP server from OpenAPI spec..."
           npm run generate
-          echo "✅ MCP server generated"
+
+          # Verify generation succeeded
+          if [ ! -f "build/src/index.ts" ]; then
+            echo "❌ Generation failed - index.ts not found"
+            exit 1
+          fi
+
+          # Verify build succeeded (postgenerate hook builds automatically)
+          if [ ! -f "build/build/index.js" ]; then
+            echo "❌ Build failed - build/build/index.js not found"
+            exit 1
+          fi
+
+          echo "✅ MCP server generated and built successfully"
 
       - name: Run unit tests
         id: unit-test
@@ -142,7 +155,7 @@ jobs:
         if: steps.test-status.outputs.passed == 'true'
         run: |
           echo "📦 Creating tarball of generated code..."
-          cd src
+          cd build
           tar --exclude='./runtime' -czf ../generated-mcp-server.tar.gz .
           cd ..
           echo "✅ Tarball created"
