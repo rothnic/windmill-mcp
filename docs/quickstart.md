@@ -112,24 +112,26 @@ npm install
 #### Option A: With Local Windmill (Full Stack)
 
 ```bash
-# Starts Docker, generates, builds everything
-npm run dev:setup
+# Start local Windmill with Docker
+npm run docker:dev
+
+# Generate the MCP server (fetch → generate → override → build)
+npm run generate
 
 # In another terminal, run the MCP server
-npm run dev:mcp
+npm run dev
 ```
 
 #### Option B: Without Docker (Use Your Own Windmill)
 
 ```bash
 # Generate and build the MCP server
-npm run dev:mcp:ready
+npm run generate
 
 # Run it against your instance
-cd src
 WINDMILL_BASE_URL=https://your-instance.windmill.dev \
 WINDMILL_API_TOKEN=your-token \
-node build/index.js
+npm run dev
 ```
 
 ### Available Commands
@@ -137,23 +139,24 @@ node build/index.js
 From the root directory:
 
 ```bash
-# Complete setup with Docker
-npm run dev:setup
+# Generation
+npm run generate      # Complete generation workflow (fetch → generate → override → build)
+npm run fetch-spec    # Fetch OpenAPI spec only
+npm run build:generated  # Build generated code only
 
-# Generate without Docker
-npm run dev:mcp:ready
+# Development
+npm run dev          # Run MCP server
 
-# Run MCP server (rebuilds automatically)
-npm run dev:mcp
-
-# Run tests
-npm test
-npm run test:e2e
+# Testing
+npm test             # Run all tests
+npm run test:unit    # Run unit tests
+npm run test:e2e     # Run E2E tests (requires Docker)
+npm run test:e2e:full  # Full E2E suite with setup
 
 # Docker management
-npm run docker:dev    # Start Windmill
-npm run docker:down   # Stop Windmill
-npm run docker:clean  # Remove all data
+npm run docker:dev   # Start Windmill
+npm run docker:stop  # Stop Windmill
+npm run docker:clean # Remove all data
 ```
 
 2. **Install dependencies**:
@@ -215,11 +218,14 @@ npm test
 # Unit tests only
 npm run test:unit
 
-# Integration tests
-npm run test:integration
+# E2E tests (requires Docker)
+npm run test:e2e
 
-# Test against live Windmill instance
-npm run test:live
+# Full E2E suite with setup
+npm run test:e2e:full
+
+# Coverage report
+npm run test:coverage
 ```
 
 ## Common Tasks

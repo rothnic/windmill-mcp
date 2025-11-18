@@ -25,11 +25,11 @@ This project uses **Vitest** as the test framework with three levels of testing:
 
 ### When to Use Each Test Type
 
-| Test Type | Use When | Speed | External Deps | Run Frequency |
-|-----------|----------|-------|---------------|---------------|
-| Unit | Testing logic, functions, utilities | ⚡ Fast | ❌ None | Every commit |
-| Integration | Testing component interactions | 🏃 Medium | ⚠️ Mocked | Before merge |
-| E2E | Testing complete workflows | 🐌 Slow | ✅ Real Windmill | Before release |
+| Test Type   | Use When                            | Speed     | External Deps    | Run Frequency  |
+| ----------- | ----------------------------------- | --------- | ---------------- | -------------- |
+| Unit        | Testing logic, functions, utilities | ⚡ Fast   | ❌ None          | Every commit   |
+| Integration | Testing component interactions      | 🏃 Medium | ⚠️ Mocked        | Before merge   |
+| E2E         | Testing complete workflows          | 🐌 Slow   | ✅ Real Windmill | Before release |
 
 ### Test Pyramid
 
@@ -57,11 +57,11 @@ npm test
 # Unit tests only (fast)
 npm run test:unit
 
-# Integration tests
-npm run test:integration
-
 # E2E tests (requires Windmill)
 npm run test:e2e
+
+# Full E2E suite with setup
+npm run test:e2e:full
 ```
 
 ### Watch Mode
@@ -89,18 +89,18 @@ Unit tests are fast and don't require external services.
 Use the `MockWindmillClient` from `tests/utils/mocks.js`:
 
 ```javascript
-import { describe, it, expect } from 'vitest';
-import { MockWindmillClient, mockJob } from '../utils/mocks.js';
+import { describe, it, expect } from "vitest";
+import { MockWindmillClient, mockJob } from "../utils/mocks.js";
 
-describe('Job Handler', () => {
-  it('should process job data', async () => {
+describe("Job Handler", () => {
+  it("should process job data", async () => {
     const client = new MockWindmillClient();
-    const jobs = await client.listJobs('workspace');
-    
+    const jobs = await client.listJobs("workspace");
+
     expect(jobs).toBeInstanceOf(Array);
     expect(jobs[0]).toMatchObject({
       id: expect.any(String),
-      status: 'completed',
+      status: "completed",
     });
   });
 });
@@ -133,28 +133,28 @@ Integration tests verify component interactions.
 ### Writing Integration Tests
 
 ```javascript
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from "vitest";
 
-describe('MCP Tool Integration', () => {
+describe("MCP Tool Integration", () => {
   let server;
-  
+
   beforeEach(() => {
     // Setup MCP server with mocked client
     server = createTestServer();
   });
-  
-  it('should handle list_jobs tool call', async () => {
+
+  it("should handle list_jobs tool call", async () => {
     const request = {
-      method: 'tools/call',
+      method: "tools/call",
       params: {
-        name: 'list_jobs',
-        arguments: { workspace: 'test' },
+        name: "list_jobs",
+        arguments: { workspace: "test" },
       },
     };
-    
+
     const response = await server.handleRequest(request);
-    
-    expect(response).toHaveProperty('content');
+
+    expect(response).toHaveProperty("content");
     expect(response.isError).toBe(false);
   });
 });
@@ -172,11 +172,13 @@ E2E tests run against a real Windmill instance using Docker.
 ### MCP Integration Testing
 
 The MCP integration tests verify the complete workflow:
+
 ```
 MCP Client → MCP Server → Windmill API → Response
 ```
 
 These tests:
+
 - Use the auto-generated MCP server (490 tools from OpenAPI spec)
 - Call tools via MCP protocol and validate actual data from Windmill
 - Verify response structures (jobs, scripts, workflows, users, workspaces, resources)
@@ -185,6 +187,7 @@ These tests:
 - Query real data from Windmill instance to ensure integration works
 
 **Test Coverage:**
+
 - Version information retrieval
 - Job listing and querying specific jobs
 - Script listing with structure validation
@@ -231,14 +234,17 @@ E2E_WORKSPACE=admins
 
 #### Complete Development Setup
 
-Set up everything for development in one command:
+Set up everything for development:
 
 ```bash
-# Start Windmill, generate MCP server, and build it
-npm run dev:setup
+# 1. Start Windmill
+npm run docker:dev
 
-# Then in another terminal, run the MCP server
-npm run dev:mcp
+# 2. Generate the MCP server
+npm run generate
+
+# 3. In another terminal, run the MCP server
+npm run dev
 
 # The MCP server will be connected to your local Windmill instance
 ```
@@ -246,26 +252,29 @@ npm run dev:mcp
 #### Manual Setup Steps
 
 1. **Start Windmill**:
+
 ```bash
 npm run docker:up
 ```
 
 2. **Wait for startup** (30-60 seconds):
+
 ```bash
 npm run docker:wait
 ```
 
 3. **Get API Token**:
-   
+
    **For Development** (easiest):
    - Use the superadmin secret: `test-super-secret`
    - No need to create an account or login
-   
+
    **For Production-like Testing**:
    - Access http://localhost:8000
    - Login/create account
    - User Settings → Tokens → Create token
    - Add to `.env`:
+
    ```bash
    E2E_WINDMILL_URL=http://localhost:8000
    E2E_WINDMILL_TOKEN=your-token-here
@@ -273,11 +282,13 @@ npm run docker:wait
    ```
 
 4. **Run E2E tests**:
+
 ```bash
 npm run test:e2e
 ```
 
 5. **Cleanup**:
+
 ```bash
 # Stop containers but keep data
 npm run docker:down
@@ -289,6 +300,7 @@ npm run docker:clean
 ### Complete E2E Cycle
 
 Run everything automatically:
+
 ```bash
 npm run test:e2e:full
 ```
@@ -298,11 +310,12 @@ This starts Windmill, waits for it to be ready, runs tests, and cleans up.
 ### Writing E2E Tests
 
 ```javascript
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll } from "vitest";
 
-const isE2EEnabled = process.env.E2E_WINDMILL_URL && process.env.E2E_WINDMILL_TOKEN;
+const isE2EEnabled =
+  process.env.E2E_WINDMILL_URL && process.env.E2E_WINDMILL_TOKEN;
 
-describe.skipIf(!isE2EEnabled)('Job Execution E2E', () => {
+describe.skipIf(!isE2EEnabled)("Job Execution E2E", () => {
   const baseUrl = process.env.E2E_WINDMILL_URL;
   const token = process.env.E2E_WINDMILL_TOKEN;
   const workspace = process.env.E2E_WORKSPACE;
@@ -313,26 +326,26 @@ describe.skipIf(!isE2EEnabled)('Job Execution E2E', () => {
     expect(response.ok).toBe(true);
   });
 
-  it('should execute a simple script', async () => {
+  it("should execute a simple script", async () => {
     // Create and run a script
     const response = await fetch(
       `${baseUrl}/api/w/${workspace}/jobs/run/inline`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          language: 'python3',
+          language: "python3",
           content: 'print("Hello from E2E test")',
         }),
-      }
+      },
     );
-    
+
     expect(response.ok).toBe(true);
     const job = await response.json();
-    expect(job).toHaveProperty('id');
+    expect(job).toHaveProperty("id");
   });
 });
 ```
@@ -362,7 +375,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
       - run: npm ci
       - run: npm run test:unit
 
@@ -372,21 +385,21 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
       - run: npm ci
-      
+
       - name: Start Windmill
         run: npm run docker:up
-      
+
       - name: Wait for Windmill
         run: npm run docker:wait
-      
+
       - name: Run E2E Tests
         run: npm run test:e2e
         env:
           E2E_WINDMILL_URL: http://localhost:8000
           E2E_WINDMILL_TOKEN: ${{ secrets.E2E_TOKEN }}
-      
+
       - name: Stop Windmill
         if: always()
         run: npm run docker:down
@@ -399,6 +412,7 @@ jobs:
 **Problem**: `Cannot find module 'vitest'`
 
 **Solution**: Install dependencies:
+
 ```bash
 npm install
 ```
@@ -408,6 +422,7 @@ npm install
 **Problem**: All E2E tests show as skipped
 
 **Solution**: Set environment variables:
+
 ```bash
 export E2E_WINDMILL_URL=http://localhost:8000
 export E2E_WINDMILL_TOKEN=your-token
@@ -419,6 +434,7 @@ npm run test:e2e
 **Problem**: `Error: port 8000 already in use`
 
 **Solution**: Stop the conflicting service:
+
 ```bash
 lsof -i :8000
 # Kill the process or use different port
@@ -429,6 +445,7 @@ lsof -i :8000
 **Problem**: Tests fail with timeout errors
 
 **Solution**: Increase timeout in `vitest.config.js`:
+
 ```javascript
 testTimeout: 60000, // 60 seconds
 ```
@@ -448,6 +465,7 @@ npm run test:coverage
 ### View Coverage
 
 Coverage reports are generated in `coverage/`:
+
 - `coverage/index.html` - HTML report (open in browser)
 - `coverage/coverage-final.json` - JSON report
 - Console output during test run
