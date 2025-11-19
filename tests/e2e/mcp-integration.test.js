@@ -27,13 +27,13 @@ const __dirname = path.dirname(__filename);
 const isE2EEnabled =
   (process.env.E2E_WINDMILL_URL || process.env.WINDMILL_BASE_URL) &&
   (process.env.E2E_WINDMILL_TOKEN || process.env.WINDMILL_API_TOKEN);
-const workspace = process.env.E2E_WORKSPACE || "demo";
+let workspace;
 
 /**
  * Create an MCP client connected to our MCP server
  */
 async function createMCPClient() {
-  const serverPath = path.join(__dirname, "../../build/build/index.js");
+  const serverPath = path.join(__dirname, "../../build/dist/index.js");
 
   // Create transport
   const transport = new StdioClientTransport({
@@ -44,6 +44,11 @@ async function createMCPClient() {
       WINDMILL_BASE_URL:
         process.env.E2E_WINDMILL_URL || process.env.WINDMILL_BASE_URL,
       WINDMILL_API_TOKEN:
+        process.env.E2E_WINDMILL_TOKEN || process.env.WINDMILL_API_TOKEN,
+      // Map common token env vars to generated-server expected scheme-specific vars
+      BEARER_TOKEN_BEARERAUTH:
+        process.env.E2E_WINDMILL_TOKEN || process.env.WINDMILL_API_TOKEN,
+      API_KEY_COOKIEAUTH:
         process.env.E2E_WINDMILL_TOKEN || process.env.WINDMILL_API_TOKEN,
     },
   });
@@ -61,6 +66,28 @@ async function createMCPClient() {
 
   // Connect
   await client.connect(transport);
+
+  // Backwards-compatibility wrapper for client.request:
+  // The SDK now expects (request, resultSchema, options). Older tests
+  // passed options as the second argument. Wrap client.request so tests
+  // can continue to call client.request(req, options) or client.request(req).
+  const origRequest = client.request.bind(client);
+  client.request = (req, maybeSchemaOrOptions, maybeOptions) => {
+    // If the second arg looks like options (no .parse), treat it as options.
+    if (
+      maybeSchemaOrOptions &&
+      typeof maybeSchemaOrOptions === "object" &&
+      typeof maybeSchemaOrOptions.parse !== "function"
+    ) {
+      return origRequest(req, { parse: (v) => v }, maybeSchemaOrOptions);
+    }
+    // If no schema provided, default to identity parser and pass through options
+    if (maybeSchemaOrOptions === undefined) {
+      return origRequest(req, { parse: (v) => v }, maybeOptions);
+    }
+    // Otherwise assume caller provided a proper schema
+    return origRequest(req, maybeSchemaOrOptions, maybeOptions);
+  };
 
   return { client, transport };
 }
@@ -93,6 +120,32 @@ describe.skipIf(!isE2EEnabled)("MCP Server E2E Tests", () => {
         { timeout: 10000 },
       );
       expect(pingResponse).toHaveProperty("tools");
+
+      // Determine a workspace to use for workspace-scoped tests.
+      // Prefer the explicit env var, otherwise query Windmill for available workspaces.
+      if (process.env.E2E_WORKSPACE) {
+        workspace = process.env.E2E_WORKSPACE;
+      } else {
+        try {
+          const workspacesResp = await mcpClient.request(
+            {
+              method: "tools/call",
+              params: { name: "listWorkspaces", arguments: {} },
+            },
+            { timeout: 10000 },
+          );
+          if (!workspacesResp.isError) {
+            const workspaces = JSON.parse(workspacesResp.content[0].text);
+            if (Array.isArray(workspaces) && workspaces.length > 0) {
+              // Prefer id, fall back to name
+              workspace = workspaces[0].id || workspaces[0].name;
+            }
+          }
+        } catch (err) {
+          // If workspace discovery fails, keep workspace undefined so tests that require it can fail explicitly.
+          console.warn("Workspace discovery failed:", err?.message || err);
+        }
+      }
     } catch (error) {
       console.error("Failed to initialize MCP server:", error.message);
       throw new Error(

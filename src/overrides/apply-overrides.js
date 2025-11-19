@@ -78,34 +78,97 @@ async function applyJsonPatch(patchFilePath, srcDir) {
   console.log(`🔧 Applying JSON patch: ${path.basename(patchFilePath)}`);
 
   const patchContent = await fs.readFile(patchFilePath, "utf-8");
-  const patches = JSON.parse(patchContent);
+  let patches;
+
+  // Support both array and object patch formats
+  try {
+    patches = JSON.parse(patchContent);
+  } catch (err) {
+    console.log(`   ❌ Invalid JSON patch file: ${err.message}`);
+    return 0;
+  }
 
   let appliedCount = 0;
 
-  // Process each patch
+  // If patches is an array (legacy), convert to our object format
+  if (Array.isArray(patches)) {
+    // Legacy format: [{ file: "tsconfig.json", operations: [{ type: 'replace', old: '...', new: '...'}]}]
+    for (const item of patches) {
+      const target = item.file;
+      console.log(`   → Processing (legacy): ${target}`);
+      const fullTargetPath = path.join(srcDir, target);
+
+      // Ensure target file exists
+      try {
+        await fs.access(fullTargetPath);
+      } catch {
+        console.log(`   ⚠️  Target file not found: ${target}`);
+        continue;
+      }
+
+      let fileContent = await fs.readFile(fullTargetPath, "utf-8");
+      let modified = false;
+
+      for (const op of item.operations || []) {
+        if (op.type === "replace" && op.old && op.new) {
+          if (fileContent.includes(op.old)) {
+            fileContent = fileContent.replace(op.old, op.new);
+            modified = true;
+            console.log(`   ✅ Replaced content (legacy)`);
+          } else {
+            console.log(`   ⚠️  Old string not found for replacement (legacy)`);
+          }
+        } else {
+          console.log(
+            `   ⚠️  Unsupported legacy operation: ${JSON.stringify(op)}`,
+          );
+        }
+      }
+
+      if (modified) {
+        await fs.writeFile(fullTargetPath, fileContent);
+        appliedCount++;
+      }
+    }
+
+    return appliedCount;
+  }
+
+  // Current object format: { "path": { action: 'replace', content: '...', oldString: '...' } }
   for (const [targetPath, operations] of Object.entries(patches)) {
     const fullTargetPath = path.join(srcDir, targetPath);
 
     console.log(`   → Processing: ${targetPath}`);
 
-    // Ensure target file exists
-    try {
-      await fs.access(fullTargetPath);
-    } catch {
+    // Try both srcDir location and build root (for tsconfig located at build/)
+    let candidatePaths = [fullTargetPath, path.join(projectRoot, targetPath)];
+
+    let found = false;
+    let actualPath;
+    for (const p of candidatePaths) {
+      try {
+        await fs.access(p);
+        found = true;
+        actualPath = p;
+        break;
+      } catch (err) {
+        // continue
+      }
+    }
+
+    if (!found) {
       console.log(`   ⚠️  Target file not found: ${targetPath}`);
       continue;
     }
 
-    let fileContent = await fs.readFile(fullTargetPath, "utf-8");
+    let fileContent = await fs.readFile(actualPath, "utf-8");
     let modified = false;
 
-    // Apply operations
     if (operations.content && operations.action) {
-      const { content, action } = operations;
+      const { content, action, oldString } = operations;
 
       switch (action) {
         case "append":
-          // Check if content already exists to avoid duplicates
           if (!fileContent.includes(content.trim())) {
             fileContent += "\n\n" + content;
             modified = true;
@@ -124,13 +187,9 @@ async function applyJsonPatch(patchFilePath, srcDir) {
           }
           break;
         case "replace":
-          if (operations.oldString) {
-            const newContent = fileContent.replace(
-              operations.oldString,
-              content,
-            );
-            if (newContent !== fileContent) {
-              fileContent = newContent;
+          if (oldString) {
+            if (fileContent.includes(oldString)) {
+              fileContent = fileContent.replace(oldString, content);
               modified = true;
               console.log(`   ✅ Replaced content`);
             } else {
@@ -143,11 +202,12 @@ async function applyJsonPatch(patchFilePath, srcDir) {
         default:
           console.log(`   ⚠️  Unknown action: ${action}`);
       }
+    } else {
+      console.log(`   ⚠️  Invalid patch format for: ${targetPath}`);
     }
 
-    // Write back if modified
     if (modified) {
-      await fs.writeFile(fullTargetPath, fileContent);
+      await fs.writeFile(actualPath, fileContent);
       appliedCount++;
     }
   }

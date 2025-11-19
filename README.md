@@ -171,17 +171,17 @@ Test the MCP server using the MCP Inspector:
 # With local Windmill instance (matches OpenCode config)
 WINDMILL_BASE_URL=http://localhost:8000 \
 WINDMILL_API_TOKEN=test-super-secret \
-npx @modelcontextprotocol/inspector node build/build/index.js
+npx @modelcontextprotocol/inspector node build/dist/index.js
 
 # Using absolute path (for use outside project directory)
 WINDMILL_BASE_URL=http://localhost:8000 \
 WINDMILL_API_TOKEN=test-super-secret \
-npx @modelcontextprotocol/inspector node /Users/nroth/workspace/windmill-mcp/build/build/index.js
+npx @modelcontextprotocol/inspector node /Users/nroth/workspace/windmill-mcp/build/dist/index.js
 
 # With your own Windmill instance
 WINDMILL_BASE_URL=https://your-instance.windmill.dev \
 WINDMILL_API_TOKEN=your-api-token \
-npx @modelcontextprotocol/inspector node build/build/index.js
+npx @modelcontextprotocol/inspector node build/dist/index.js
 ```
 
 This will open a web interface where you can:
@@ -201,7 +201,7 @@ npm run generate
 # This single command performs the complete workflow:
 # 1. Pre-generation: Fetches the latest OpenAPI specification
 # 2. Generation: Creates TypeScript MCP server in build/src/
-# 3. Post-generation: Applies overrides and builds to build/build/
+# 3. Post-generation: Applies overrides and builds to build/dist/
 
 # The compiled JavaScript is immediately ready to use
 # No manual build step needed!
@@ -257,7 +257,7 @@ This single command performs the complete workflow:
 3. **Post-generation**:
    - Applies custom overrides from the `src/overrides/` directory
    - Installs dependencies in `build/`
-   - Builds the TypeScript code to JavaScript in `build/build/`
+   - Builds the TypeScript code to JavaScript in `build/dist/`
 
 The compiled server is immediately ready to use - no additional build steps needed!
 

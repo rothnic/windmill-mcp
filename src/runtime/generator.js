@@ -6,11 +6,11 @@
  * Generates MCP server code locally when artifacts are not available.
  */
 
-import { execSync } from 'child_process';
-import path from 'path';
-import fs from 'fs/promises';
-import { fileURLToPath } from 'url';
-import { saveToCache, getCacheDir } from './cache.js';
+import { execSync } from "child_process";
+import path from "path";
+import fs from "fs/promises";
+import { fileURLToPath } from "url";
+import { saveToCache } from "./cache.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,10 +21,12 @@ const __dirname = path.dirname(__filename);
  * @returns {Promise<void>}
  */
 export async function generateLocally(windmillVersion) {
-  console.log(`🔧 Generating MCP server locally for Windmill ${windmillVersion}...`);
+  console.log(
+    `🔧 Generating MCP server locally for Windmill ${windmillVersion}...`,
+  );
 
-  const projectRoot = path.resolve(__dirname, '..', '..');
-  const generatorDir = path.join(projectRoot, 'src', 'generator');
+  const projectRoot = path.resolve(__dirname, "..", "..");
+  const generatorDir = path.join(projectRoot, "src", "generator");
 
   try {
     // Fetch OpenAPI spec
@@ -33,9 +35,9 @@ export async function generateLocally(windmillVersion) {
 
     // Run generator
     console.log(`⚙️  Running generator...`);
-    execSync('npm run generate', {
+    execSync("npm run generate", {
       cwd: projectRoot,
-      stdio: 'inherit',
+      stdio: "inherit",
       env: {
         ...process.env,
         WINDMILL_VERSION: windmillVersion,
@@ -43,7 +45,7 @@ export async function generateLocally(windmillVersion) {
     });
 
     // The generated code should be in build/ directory
-    const generatedDir = path.join(projectRoot, 'build');
+    const generatedDir = path.join(projectRoot, "build");
 
     // Save to cache
     await saveToCache(generatedDir, windmillVersion);
@@ -65,8 +67,8 @@ async function fetchOpenAPISpec(windmillVersion, generatorDir) {
   // Determine spec URL based on version
   let specUrl;
 
-  if (windmillVersion === 'latest') {
-    specUrl = 'https://app.windmill.dev/api/openapi.json';
+  if (windmillVersion === "latest") {
+    specUrl = "https://app.windmill.dev/api/openapi.json";
   } else {
     // For specific versions, try to get from Windmill's GitHub releases
     // This is a fallback approach - ideally we'd have a way to get specific version specs
@@ -76,10 +78,10 @@ async function fetchOpenAPISpec(windmillVersion, generatorDir) {
   console.log(`   Spec URL: ${specUrl}`);
 
   // Run fetch-spec with custom URL
-  const { execSync } = await import('child_process');
-  execSync('npm run fetch-spec', {
+  const { execSync } = await import("child_process");
+  execSync("npm run fetch-spec", {
     cwd: path.dirname(generatorDir),
-    stdio: 'inherit',
+    stdio: "inherit",
     env: {
       ...process.env,
       OPENAPI_SPEC_URL: specUrl,
@@ -92,8 +94,13 @@ async function fetchOpenAPISpec(windmillVersion, generatorDir) {
  * @returns {Promise<boolean>} Whether generator is available
  */
 export async function isGeneratorAvailable() {
-  const projectRoot = path.resolve(__dirname, '..', '..');
-  const generatorPath = path.join(projectRoot, 'src', 'generator', 'generate.js');
+  const projectRoot = path.resolve(__dirname, "..", "..");
+  const generatorPath = path.join(
+    projectRoot,
+    "src",
+    "generator",
+    "generate.js",
+  );
 
   try {
     await fs.access(generatorPath);

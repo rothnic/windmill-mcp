@@ -1,12 +1,16 @@
 ls:
   # Root directory - specific uppercase files allowed
   .js: regex:^vitest\.config$
-  .json: regex:^package$
+  .json: regex:^(package|\.eslintrc)$
   .yml: regex:^\.ls-lint$
   .md: regex:^(README|CHANGELOG|CONTRIBUTING|PROJECT_STATUS|AGENTS)$
   .example: regex:^\.env$
-  .ignore: regex:^(\.gitignore|\.npmignore)$
+  .ignore: regex:^(\.gitignore|\.npmignore|\.eslintignore)$
   .dir: regex:^([a-z][a-z0-9-]*|\.github|\.husky)$ # kebab-case or conventional dot-directories
+
+  # Scripts directory
+  scripts:
+    .js: kebab-case
 
   # GitHub workflows
   .github/workflows:
@@ -48,3 +52,4 @@ ignore:
   - .env.local
   - package-lock.json
   - npm-debug.log
+  - .opencode # OpenCode configuration (user-specific)

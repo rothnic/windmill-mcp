@@ -1,13 +1,14 @@
 {
   "windmill": {
-    "baseUrl": "https://app.windmill.dev",
-    "workspace": "demo",
-    "timeout": 30000
+    "baseUrl": "http://localhost:8000",
+    "workspace": "admins",
+    "timeout": 30000,
+    "superadminSecret": "test-super-secret"
   },
   "test": {
     "integration": {
       "enabled": true,
-      "skipOnMissingCredentials": true
+      "skipOnMissingCredentials": false
     },
     "unit": {
       "enabled": true

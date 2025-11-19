@@ -10,16 +10,17 @@
  * 4. Loads and runs the MCP server
  */
 
-import { fileURLToPath } from 'url';
-import path from 'path';
-import { isCached, getCachedCodePath, listCachedVersions, clearCache } from './cache.js';
-import { downloadArtifact, listAvailableVersions } from './downloader.js';
-import { generateLocally, isGeneratorAvailable } from './generator.js';
-import { createRequire } from 'module';
+import {
+  isCached,
+  getCachedCodePath,
+  listCachedVersions,
+  clearCache,
+} from "./cache.js";
+import { downloadArtifact, listAvailableVersions } from "./downloader.js";
+import { generateLocally, isGeneratorAvailable } from "./generator.js";
+import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 /**
  * Main entry point
@@ -29,40 +30,40 @@ async function main() {
   const args = process.argv.slice(2);
 
   // Handle CLI commands
-  if (args.includes('--clear-cache')) {
-    const version = args[args.indexOf('--clear-cache') + 1];
+  if (args.includes("--clear-cache")) {
+    const version = args[args.indexOf("--clear-cache") + 1];
     await clearCache(version);
     return;
   }
 
-  if (args.includes('--list-cached')) {
+  if (args.includes("--list-cached")) {
     const versions = await listCachedVersions();
-    console.log('📦 Cached versions:');
-    versions.forEach(v => console.log(`   - ${v}`));
+    console.log("📦 Cached versions:");
+    versions.forEach((v) => console.log(`   - ${v}`));
     return;
   }
 
-  if (args.includes('--list-available')) {
+  if (args.includes("--list-available")) {
     const versions = await listAvailableVersions();
-    console.log('🌐 Available versions:');
-    versions.forEach(v => console.log(`   - ${v}`));
+    console.log("🌐 Available versions:");
+    versions.forEach((v) => console.log(`   - ${v}`));
     return;
   }
 
-  if (args.includes('--help') || args.includes('-h')) {
+  if (args.includes("--help") || args.includes("-h")) {
     printHelp();
     return;
   }
 
   // Get Windmill version from environment variable
-  const windmillVersion = process.env.WINDMILL_VERSION || 'latest';
-  const packageJson = require('../../package.json');
+  const windmillVersion = process.env.WINDMILL_VERSION || "latest";
+  const packageJson = require("../../package.json");
   const packageVersion = packageJson.version;
 
-  console.log('🚀 Starting Windmill MCP Server');
+  console.log("🚀 Starting Windmill MCP Server");
   console.log(`   Windmill version: ${windmillVersion}`);
   console.log(`   Package version: ${packageVersion}`);
-  console.log('');
+  console.log("");
 
   // Check if cached
   if (await isCached(windmillVersion)) {
@@ -86,7 +87,9 @@ async function main() {
 
   if (!(await isGeneratorAvailable())) {
     console.error(`❌ Generator not available.`);
-    console.error(`   Please install the full package or use a released version.`);
+    console.error(
+      `   Please install the full package or use a released version.`,
+    );
     process.exit(1);
   }
 
@@ -101,16 +104,18 @@ async function main() {
 async function loadMCPServer(windmillVersion) {
   const mcpServerPath = getCachedCodePath(windmillVersion);
 
-  console.log('');
+  console.log("");
   console.log(`🎯 Loading MCP server from: ${mcpServerPath}`);
-  console.log('');
+  console.log("");
 
   try {
     // Dynamically import the generated MCP server
     await import(mcpServerPath);
   } catch (error) {
     console.error(`❌ Failed to load MCP server: ${error.message}`);
-    console.error(`   Cache may be corrupted. Try: --clear-cache ${windmillVersion}`);
+    console.error(
+      `   Cache may be corrupted. Try: --clear-cache ${windmillVersion}`,
+    );
     process.exit(1);
   }
 }
@@ -154,6 +159,6 @@ Examples:
 
 // Run main function
 main().catch((error) => {
-  console.error('Fatal error:', error);
+  console.error("Fatal error:", error);
   process.exit(1);
 });

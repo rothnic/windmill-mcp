@@ -108,8 +108,8 @@ jobs:
           fi
 
           # Verify build succeeded (postgenerate hook builds automatically)
-          if [ ! -f "build/build/index.js" ]; then
-            echo "❌ Build failed - build/build/index.js not found"
+          if [ ! -f "build/dist/index.js" ]; then
+            echo "❌ Build failed - build/dist/index.js not found"
             exit 1
           fi
 
@@ -127,7 +127,7 @@ jobs:
         env:
           E2E_WINDMILL_URL: http://localhost:8000
           E2E_WINDMILL_TOKEN: test-super-secret
-          E2E_WORKSPACE: demo
+          E2E_WORKSPACE: admins
           WINDMILL_BASE_URL: http://localhost:8000
         run: |
           echo "🧪 Running E2E tests..."

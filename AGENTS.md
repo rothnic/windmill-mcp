@@ -48,7 +48,7 @@ The `npm run generate` command executes a complete workflow:
 3. **Post-generation** (`postgenerate` hook):
    - Applies custom overrides from `overrides/`
    - Installs dependencies in `build/`
-   - Compiles TypeScript to `build/build/index.js`
+   - Compiles TypeScript to `build/dist/index.js`
 
 **Output Structure**:
 
@@ -64,7 +64,7 @@ build/
 
 **Troubleshooting**:
 
-- If build fails, check `build/build/index.js` exists after generation
+- If build fails, check `build/dist/index.js` exists after generation
 - Generated code location changed from `src/` to `build/` in recent updates
 - The complete workflow is now atomic - no need to manually build after generation
 
