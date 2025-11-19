@@ -22,9 +22,14 @@ cd windmill-mcp
 npm install
 
 # Generate the MCP server from Windmill's OpenAPI spec
-npm run fetch-spec  # Fetch OpenAPI spec
-npm run generate    # Generate MCP server code
+npm run generate
 ```
+
+This command will:
+- Fetch the latest OpenAPI spec from Windmill
+- Generate MCP server code
+- Apply any custom overrides
+- Build the TypeScript code to JavaScript
 
 2. **Get your Windmill credentials**:
    - Go to your Windmill instance
