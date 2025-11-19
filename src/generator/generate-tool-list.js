@@ -36,7 +36,7 @@ const OUTPUT_PATH = path.resolve(
   __dirname,
   "..",
   "..",
-  "docs/generated-tools.md",
+  "docs/reference/generated-tools.md",
 );
 
 /**

@@ -135,15 +135,15 @@ npm run test:coverage      # Generate coverage report
 
 - Keep README.md up to date
 - Maintain API documentation
-- Update `docs/project-plan.md` and `docs/sprints.md`
+- Update `docs/planning/project-plan.md` and `docs/planning/sprints.md`
 - Create tutorials and guides
 - Ensure documentation accuracy
 
 **Key Files**:
 
 - `README.md`
-- `docs/project-plan.md`
-- `docs/sprints.md`
+- `docs/planning/project-plan.md`
+- `docs/planning/sprints.md`
 - `docs/**/*`
 
 ---
@@ -437,6 +437,6 @@ npm run docker:wait        # Wait for services to be ready
 
 ## Related Files
 
-- [project-plan.md](../../docs/project-plan.md) - Project roadmap and phases
-- [sprints.md](../../docs/sprints.md) - Sprint planning and tracking
+- [project-plan.md](docs/planning/project-plan.md) - Project roadmap and phases
+- [sprints.md](docs/planning/sprints.md) - Sprint planning and tracking
 - [README.md](../../README.md) - Main project documentation
