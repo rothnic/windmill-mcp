@@ -23,10 +23,10 @@ This project uses AI agents to assist with development, maintenance, and testing
 
 **Key Files**:
 
-- `generator/config.json`
-- `generator/fetch-spec.js`
-- `generator/generate.js`
-- `overrides/apply-overrides.js`
+- `src/generator/config.json`
+- `src/generator/fetch-spec.js`
+- `src/generator/generate.js`
+- `src/overrides/apply-overrides.js`
 
 **Commands**:
 
@@ -286,9 +286,9 @@ RUN_TESTS_ON_GENERATE=true
 
 Store in respective config files:
 
-- Generator: `generator/config.json`
+- Generator: `src/generator/config.json`
 - Testing: `tests/config.json`
-- Overrides: `overrides/config.json`
+- Overrides: `src/overrides/config.json`
 
 ---
 
