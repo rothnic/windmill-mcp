@@ -62,8 +62,8 @@ jobs:
       - name: Validate generator scripts
         run: |
           echo "Validating generator scripts..."
-          node src/generator/fetch-spec.js --help
-          node src/generator/generate.js --help
+          node --check src/generator/fetch-spec.js
+          node --check src/generator/generate.js
           echo "✅ Generator scripts are valid"
 
       - name: Test OpenAPI spec fetch
