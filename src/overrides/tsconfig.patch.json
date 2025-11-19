@@ -1,0 +1,7 @@
+{
+  "build/tsconfig.json": {
+    "action": "replace",
+    "content": "\"outDir\": \"./dist\"",
+    "oldString": "\"outDir\": \"./build\""
+  }
+}

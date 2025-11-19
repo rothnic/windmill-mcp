@@ -1,0 +1,7 @@
+{
+  "build/package.json": {
+    "action": "replace",
+    "content": "\"main\": \"dist/index.js\"",
+    "oldString": "\"main\": \"build/index.js\""
+  }
+}
