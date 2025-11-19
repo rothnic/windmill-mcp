@@ -1,0 +1,7 @@
+{
+  "build/package.json": {
+    "action": "replace",
+    "content": "\"build\": \"tsc && chmod 755 dist/index.js\"",
+    "oldString": "\"build\": \"tsc && chmod 755 build/index.js\""
+  }
+}
