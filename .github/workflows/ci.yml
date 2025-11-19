@@ -92,8 +92,8 @@ jobs:
           fi
 
           # Verify build succeeded (postgenerate hook builds automatically)
-          if [ ! -f "build/dist/index.js" ]; then
-            echo "❌ Build failed - build/dist/index.js not found"
+          if [ ! -f "build/build/index.js" ]; then
+            echo "❌ Build failed - build/build/index.js not found"
             exit 1
           fi
 
