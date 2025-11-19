@@ -20,11 +20,17 @@ beforeAll(() => {
   process.env.NODE_ENV = "test";
 
   // Only set defaults if environment variables are not already set
+  // These defaults match the Docker dev setup (npm run docker:dev)
   if (!process.env.WINDMILL_BASE_URL && !process.env.E2E_WINDMILL_URL) {
     process.env.WINDMILL_BASE_URL = "http://localhost:8000";
   }
   if (!process.env.WINDMILL_API_TOKEN && !process.env.E2E_WINDMILL_TOKEN) {
-    process.env.WINDMILL_API_TOKEN = "test-token";
+    // Use superadmin secret from Docker setup for local testing
+    process.env.WINDMILL_API_TOKEN = "test-super-secret";
+  }
+  if (!process.env.E2E_WORKSPACE) {
+    // Default workspace created by Windmill
+    process.env.E2E_WORKSPACE = "admins";
   }
 });
 

@@ -15,12 +15,15 @@
   "scripts": {
     "generate": "node src/generator/generate.js",
     "fetch-spec": "node src/generator/fetch-spec.js",
+    "generate-tool-list": "node src/generator/generate-tool-list.js",
     "build:generated": "cd build && npm install && npm run build",
     "pregenerate": "npm run fetch-spec",
-    "postgenerate": "npm run apply-overrides && npm run build:generated",
+    "postgenerate": "npm run add-tool-namespaces && npm run apply-overrides && npm run build:generated && npm run generate-tool-list",
+    "add-tool-namespaces": "node src/overrides/add-tool-namespaces.js",
     "apply-overrides": "node src/overrides/apply-overrides.js",
     "validate-overrides": "node src/overrides/validate-overrides.js",
-    "dev": "node build/build/index.js",
+    "dev": "node build/dist/index.js",
+    "dev:normalized": "node scripts/normalize-and-run-mcp.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -40,7 +43,8 @@
     "docker:logs": "docker compose -f tests/docker/docker-compose.yml logs -f",
     "docker:wait": "node tests/docker/wait-for-windmill.js",
     "docker:dev": "npm run docker:up && npm run docker:wait && echo '\n✅ Windmill ready at http://localhost:8000\n   Superadmin secret: test-super-secret\n   Default workspace: admins\n'",
-    "docker:clean": "docker compose -f tests/docker/docker-compose.yml down -v"
+    "docker:clean": "docker compose -f tests/docker/docker-compose.yml down -v",
+    "inspector": "node scripts/inspector.js"
   },
   "repository": {
     "type": "git",
@@ -61,7 +65,7 @@
   },
   "homepage": "https://github.com/rothnic/windmill-mcp#readme",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.5.0",
+    "@modelcontextprotocol/sdk": "^1.10.0",
     "dotenv": "^16.4.5",
     "tar": "^7.0.0"
   },
