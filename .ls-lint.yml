@@ -17,6 +17,10 @@ ls:
     .yml: kebab-case
     .yaml: kebab-case
     .md: regex:^(README|AGENTS)$
+  
+  # GitHub root level
+  .github:
+    .md: kebab-case
 
   # Source directories
   src:

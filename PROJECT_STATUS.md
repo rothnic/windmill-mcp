@@ -449,14 +449,14 @@ The project includes an automated workflow for keeping the MCP server up to date
 ## Support & Resources
 
 - **Documentation**: See [README.md](README.md)
-- **Quick Start**: See [docs/quickstart.md](docs/quickstart.md)
-- **Testing Guide**: See [docs/testing.md](docs/testing.md)
+- **Quick Start**: See [docs/guides/quickstart.md](docs/guides/quickstart.md)
+- **Testing Guide**: See [docs/development/testing.md](docs/development/testing.md)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
-- **Project Plan**: See [docs/project-plan.md](docs/project-plan.md)
-- **Sprints**: See [docs/sprints.md](docs/sprints.md)
-- **Agent Setup**: See [docs/agent-setup-complete.md](docs/agent-setup-complete.md)
-- **Agent Team Plan**: See [docs/windmill-agent-team-plan.md](docs/windmill-agent-team-plan.md)
-- **Tool List**: See [docs/generated-tools.md](docs/generated-tools.md)
+- **Project Plan**: See [docs/planning/project-plan.md](docs/planning/project-plan.md)
+- **Sprints**: See [docs/planning/sprints.md](docs/planning/sprints.md)
+- **Agent Setup**: See [docs/planning/agent-setup-complete.md](docs/planning/agent-setup-complete.md)
+- **Agent Team Plan**: See [docs/planning/windmill-agent-team-plan.md](docs/planning/windmill-agent-team-plan.md)
+- **Tool List**: See [docs/reference/generated-tools.md](docs/reference/generated-tools.md)
 
 ## Conclusion
 

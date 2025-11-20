@@ -11,8 +11,8 @@
 
 - [x] Create project directory structure
 - [x] Write comprehensive README.md
-- [x] Create `docs/project-plan.md`
-- [x] Create `docs/sprints.md`
+- [x] Create `docs/planning/project-plan.md`
+- [x] Create `docs/planning/sprints.md`
 - [x] Create AGENTS.md with agent configurations
 - [x] Set up package.json with dependencies and scripts
 - [x] Create .env.example for configuration

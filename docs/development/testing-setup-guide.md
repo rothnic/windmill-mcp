@@ -400,4 +400,4 @@ node build/dist/index.js
 4. **Docker dev setup** provides instant credentials: `test-super-secret` / workspace `admins`
 5. **Always rebuild** after changing generation: `npm run generate`
 
-For questions or issues, check the main testing guide: [docs/testing.md](./testing.md)
+For questions or issues, check the main testing guide: [docs/development/testing.md](./testing.md)

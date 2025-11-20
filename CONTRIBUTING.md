@@ -77,7 +77,7 @@ export E2E_WORKSPACE=admins
 npm run test:e2e
 ```
 
-See [TESTING.md](docs/testing.md) for comprehensive testing documentation.
+See [Testing Guide](docs/development/testing.md) for comprehensive testing documentation.
 
 ### Project Structure
 
@@ -262,7 +262,7 @@ with fallback to backup URL.
 2. Add tests for new features
 3. Ensure all tests pass
 4. Update README.md if adding user-facing features
-5. Update docs/project-plan.md or docs/sprints.md if relevant
+5. Update docs/planning/project-plan.md or docs/planning/sprints.md if relevant
 6. Submit your PR with a clear description
 
 ### PR Description Template
@@ -366,13 +366,13 @@ npm run test:e2e:full
 
 - Update README.md for user-facing changes
 - Update inline code comments for complex logic
-- Update docs/project-plan.md for architectural changes
-- Update docs/sprints.md for sprint-related work
+- Update docs/planning/project-plan.md for architectural changes
+- Update docs/planning/sprints.md for sprint-related work
 
 ## Getting Help
 
 - Check existing issues and discussions
-- Review docs/project-plan.md and docs/sprints.md
+- Review docs/planning/project-plan.md and docs/planning/sprints.md
 - Ask questions in GitHub Discussions
 - Tag maintainers in issues if stuck
 
@@ -393,6 +393,6 @@ Contributors will be acknowledged in:
 
 - GitHub contributors list
 - Release notes for significant contributions
-- docs/project-plan.md for major features
+- docs/planning/project-plan.md for major features
 
 Thank you for contributing! 🎉
